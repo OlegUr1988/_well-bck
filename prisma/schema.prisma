@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
+
+  equipment Equipment[]
+}
+
+model Equipment {
+  id      Int    @id @default(autoincrement())
+  name    String @unique @db.VarChar(255)
+  assetId Int
+  asset   Asset  @relation(fields: [assetId], references: [id])
+}
+
+model QueryType {
+  id   Int     @id @default(autoincrement())
+  name String  @unique @db.VarChar(255)
+  link String? @db.VarChar(255)
+
+  queries Query[]
+}
+
+model Query {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(255)
+  queryTypeId Int
+  queryType   QueryType @relation(fields: [queryTypeId], references: [id])
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
