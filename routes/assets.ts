@@ -20,12 +20,19 @@ router.get("/:id", async (req, res) => {
   res.send(asset);
 });
 
-router.put("/", async (req, res) => {
+router.post("/", async (req, res) => {
   const { name } = req.body as Asset;
 
   const validation = assetSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
+
+  const asset = await prisma.asset.findUnique({
+    where: { name },
+  });
+
+  if (asset?.name === name)
+    return res.status(400).send("The asset with this name is already exists.");
 
   const newAsset = await prisma.asset.create({ data: { name } });
 
