@@ -75,4 +75,18 @@ router.post("/", async (req, res) => {
   res.status(201).send(newAsset);
 });
 
+router.delete("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const asset = await prisma.asset.findUnique({
+    where: { id },
+  });
+  if (!asset)
+    return res.status(404).send("The asset with the given ID was not found.");
+
+  await prisma.asset.delete({ where: { id } });
+
+  res.send(asset);
+});
+
 export default router;
