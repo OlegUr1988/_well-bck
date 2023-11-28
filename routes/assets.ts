@@ -26,6 +26,8 @@ router.get(
 
     let assets;
 
+    const count = await prisma.asset.count();
+
     if (page && pageSize) {
       assets = await prisma.asset.findMany({
         orderBy: { name: "asc" },
@@ -35,7 +37,12 @@ router.get(
     } else {
       assets = await prisma.asset.findMany({ orderBy: { name: "asc" } });
     }
-    res.send(assets);
+    res.send({
+      assets,
+      count,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+    });
   }
 );
 
