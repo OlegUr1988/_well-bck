@@ -38,10 +38,10 @@ router.get(
       assets = await prisma.asset.findMany({ orderBy: { name: "asc" } });
     }
     res.send({
-      results: assets,
       count,
       page: parseInt(page),
       pageSize: parseInt(pageSize),
+      results: assets,
     });
   }
 );
