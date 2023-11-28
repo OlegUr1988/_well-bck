@@ -38,7 +38,7 @@ router.get(
       assets = await prisma.asset.findMany({ orderBy: { name: "asc" } });
     }
     res.send({
-      assets,
+      results: assets,
       count,
       page: parseInt(page),
       pageSize: parseInt(pageSize),
