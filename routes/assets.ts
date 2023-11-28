@@ -1,14 +1,43 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import Asset from "../entities/Asset";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const assets = await prisma.asset.findMany();
-  res.send(assets);
-});
+interface RequestParams {}
+
+interface ResponseBody {}
+
+interface RequestBody {}
+
+interface RequestQuery {
+  page: string;
+  pageSize: string;
+}
+
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
+    res: Response
+  ) => {
+    const { page, pageSize } = req.query;
+
+    let assets;
+
+    if (page && pageSize) {
+      assets = await prisma.asset.findMany({
+        orderBy: { name: "asc" },
+        skip: (parseInt(page) - 1) * parseInt(pageSize),
+        take: parseInt(pageSize),
+      });
+    } else {
+      assets = await prisma.asset.findMany({ orderBy: { name: "asc" } });
+    }
+    res.send(assets);
+  }
+);
 
 router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
