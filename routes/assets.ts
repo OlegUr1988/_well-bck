@@ -30,12 +30,12 @@ router.get(
 
     if (page && pageSize) {
       assets = await prisma.asset.findMany({
-        orderBy: { name: "asc" },
+        orderBy: { id: "asc" },
         skip: (parseInt(page) - 1) * parseInt(pageSize),
         take: parseInt(pageSize),
       });
     } else {
-      assets = await prisma.asset.findMany({ orderBy: { name: "asc" } });
+      assets = await prisma.asset.findMany({ orderBy: { id: "asc" } });
     }
     res.send({
       count,
