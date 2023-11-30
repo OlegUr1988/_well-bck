@@ -57,22 +57,52 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name } = req.body as Asset;
-
   const validation = assetSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const asset = await prisma.asset.findUnique({
+  const { name } = req.body as Asset;
+
+  const assetWithTheSameName = await prisma.asset.findUnique({
     where: { name },
   });
 
-  if (asset?.name === name)
+  if (assetWithTheSameName)
     return res.status(400).send("The asset with this name is already exists.");
 
   const newAsset = await prisma.asset.create({ data: { name } });
 
   res.status(201).send(newAsset);
+});
+
+router.put("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const asset = await prisma.asset.findUnique({
+    where: { id },
+  });
+  if (!asset)
+    return res.status(404).send("The asset with the given ID was not found.");
+
+  const validation = assetSchema.safeParse(req.body);
+  if (!validation.success)
+    return res.status(400).send(validation.error.format());
+
+  const { name } = req.body as Asset;
+
+  const assetWithTheSameName = await prisma.asset.findUnique({
+    where: { name },
+  });
+
+  if (assetWithTheSameName)
+    return res.status(400).send("The asset with this name is already exists.");
+
+  const updatedAsset = await prisma.asset.update({
+    where: { id },
+    data: { name },
+  });
+
+  res.status(200).send(updatedAsset);
 });
 
 router.delete("/:id", async (req, res) => {
