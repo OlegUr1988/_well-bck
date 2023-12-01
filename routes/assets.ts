@@ -14,6 +14,7 @@ interface RequestBody {}
 interface RequestQuery {
   page: string;
   pageSize: string;
+  searchedName: string;
 }
 
 router.get(
@@ -22,23 +23,31 @@ router.get(
     req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
     res: Response
   ) => {
-    const { page, pageSize } = req.query;
+    const { page, pageSize, searchedName } = req.query;
 
-    let assets;
+    const where = {
+      name: {
+        contains: searchedName,
+      },
+    };
 
-    const count = await prisma.asset.count();
+    const orderBy = { id: "desc" } as const;
 
-    if (page && pageSize) {
-      assets = await prisma.asset.findMany({
-        orderBy: { id: "asc" },
-        skip: (parseInt(page) - 1) * parseInt(pageSize),
-        take: parseInt(pageSize),
-      });
-    } else {
-      assets = await prisma.asset.findMany({ orderBy: { id: "asc" } });
-    }
+    const assets =
+      page && pageSize
+        ? await prisma.asset.findMany({
+            where,
+            orderBy,
+            skip: (parseInt(page) - 1) * parseInt(pageSize),
+            take: parseInt(pageSize),
+          })
+        : await prisma.asset.findMany({
+            orderBy,
+            where,
+          });
+
     res.send({
-      count,
+      count: assets.length,
       page: parseInt(page),
       pageSize: parseInt(pageSize),
       results: assets,
