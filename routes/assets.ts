@@ -31,7 +31,9 @@ router.get(
       },
     };
 
-    const orderBy = { id: "desc" } as const;
+    const orderBy = { id: "asc" } as const;
+
+    const count = await prisma.asset.count()
 
     const assets =
       page && pageSize
@@ -47,7 +49,7 @@ router.get(
           });
 
     res.send({
-      count: assets.length,
+      count,
       page: parseInt(page),
       pageSize: parseInt(pageSize),
       results: assets,
