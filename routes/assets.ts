@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import Asset from "../entities/Asset";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
+import ExcelJs, { Workbook } from "exceljs";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ router.get(
 
     const orderBy = { id: "asc" } as const;
 
-    const count = await prisma.asset.count()
+    const count = await prisma.asset.count();
 
     const assets =
       page && pageSize
@@ -56,6 +57,29 @@ router.get(
     });
   }
 );
+
+router.get("/exportToExcel", async (req, res) => {
+  const workbook = new ExcelJs.Workbook();
+  const worksheet = workbook.addWorksheet("Assets");
+
+  worksheet.addRow(["ID", "Name"]);
+
+  const assets = await prisma.asset.findMany();
+
+  assets.map((asset) => worksheet.addRow([asset.id, asset.name]));
+
+  // Set response headers
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+
+  res.setHeader("Content-Disposition", "attachment; filename=assets.xlsx");
+
+  // Send the workbook as a response
+  await workbook.xlsx.write(res);
+  res.end();
+});
 
 router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
