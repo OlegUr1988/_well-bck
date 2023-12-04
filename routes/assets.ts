@@ -1,8 +1,9 @@
+import ExcelJs, { Row } from "exceljs";
 import express, { Request, Response } from "express";
+import multer from "multer";
 import Asset from "../entities/Asset";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
-import ExcelJs, { Workbook } from "exceljs";
 
 const router = express.Router();
 
@@ -17,6 +18,9 @@ interface RequestQuery {
   pageSize: string;
   searchedName: string;
 }
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.get(
   "/",
@@ -62,11 +66,11 @@ router.get("/exportToExcel", async (req, res) => {
   const workbook = new ExcelJs.Workbook();
   const worksheet = workbook.addWorksheet("Assets");
 
-  worksheet.addRow(["ID", "Name"]);
+  worksheet.addRow(["Name", "New Name"]);
 
   const assets = await prisma.asset.findMany();
 
-  assets.map((asset) => worksheet.addRow([asset.id, asset.name]));
+  assets.map((asset) => worksheet.addRow([asset.name]));
 
   // Set response headers
   res.setHeader(
@@ -109,6 +113,64 @@ router.post("/", async (req, res) => {
 
   res.status(201).send(newAsset);
 });
+
+router.post(
+  "/importFromExcel",
+  upload.single("excelFile"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).send("No file uploaded");
+      }
+
+      const buffer = req.file.buffer;
+      const workbook = new ExcelJs.Workbook();
+      await workbook.xlsx.load(buffer);
+      const worksheet = workbook.getWorksheet("Assets");
+
+      // check headers
+      const headersRow = worksheet?.findRow(1) as Row;
+      const headers = headersRow.values;
+      if (
+        Array.isArray(headers) &&
+        headers[1] !== "Name" &&
+        headers[2] !== "New Name"
+      )
+        return res.status(400).send({ error: "Invalid headers" });
+
+      // getting data from
+      const transaction = prisma.$transaction(async (prisma) => {
+        const rows = worksheet?.findRows(2, worksheet.rowCount);
+        rows?.map(async (row) => {
+          const [item, name, newName] = row.values as string[];
+
+          if (newName) {
+            newName.toLocaleLowerCase() === "delete"
+              ? prisma.asset
+                  .delete({ where: { name } })
+                  .catch((err) => console.log(err))
+              : prisma.asset
+                  .update({
+                    where: { name },
+                    data: { name: newName },
+                  })
+                  .catch((err) => console.log(err));
+          } else
+            prisma.asset
+              .create({ data: { name } })
+              .catch((err) => console.log(err));
+        });
+      });
+
+      transaction;
+
+      res.status(200).send();
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server error");
+    }
+  }
+);
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
