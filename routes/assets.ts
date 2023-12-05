@@ -1,4 +1,4 @@
-import ExcelJs, { Row } from "exceljs";
+import ExcelJs, { CellValue, Row } from "exceljs";
 import express, { Request, Response } from "express";
 import multer from "multer";
 import Asset from "../entities/Asset";
@@ -139,30 +139,26 @@ router.post(
         return res.status(400).send({ error: "Invalid headers" });
 
       // getting data from
-      const transaction = prisma.$transaction(async (prisma) => {
+      await prisma.$transaction(async (tx) => {
         const rows = worksheet?.findRows(2, worksheet.rowCount);
-        rows?.map(async (row) => {
-          const [item, name, newName] = row.values as string[];
+        if (rows)
+          await Promise.all(
+            rows?.map(async (row) => {
+              const [item, name, newName] = row.values as string[];
 
-          if (newName) {
-            newName.toLocaleLowerCase() === "delete"
-              ? prisma.asset
-                  .delete({ where: { name } })
-                  .catch((err) => console.log(err))
-              : prisma.asset
-                  .update({
-                    where: { name },
-                    data: { name: newName },
-                  })
-                  .catch((err) => console.log(err));
-          } else
-            prisma.asset
-              .create({ data: { name } })
-              .catch((err) => console.log(err));
-        });
+              if (newName) {
+                newName.toLocaleLowerCase() === "delete"
+                  ? await prisma.asset.delete({ where: { name } })
+                  : await prisma.asset.update({
+                      where: { name },
+                      data: { name: newName },
+                    });
+              } else {
+                await prisma.asset.create({ data: { name } });
+              }
+            })
+          );
       });
-
-      transaction;
 
       res.status(200).send();
     } catch (error) {
