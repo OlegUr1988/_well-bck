@@ -71,7 +71,9 @@ router.get("/:id", async (req, res) => {
     where: { id: parseInt(req.params.id) },
   });
   if (!asset)
-    return res.status(404).send("The asset with the given ID was not found.");
+    return res
+      .status(404)
+      .send({ message: "The asset with the given ID was not found." });
 
   res.send(asset);
 });
@@ -88,7 +90,9 @@ router.post("/", async (req, res) => {
   });
 
   if (assetWithTheSameName)
-    return res.status(400).send("The asset with this name is already exists.");
+    return res
+      .status(400)
+      .send({ message: "The asset with this name is already exists." });
 
   const newAsset = await prisma.asset.create({ data: { name } });
 
@@ -110,7 +114,9 @@ router.put("/:id", async (req, res) => {
     where: { id },
   });
   if (!asset)
-    return res.status(404).send("The asset with the given ID was not found.");
+    return res
+      .status(404)
+      .send({ message: "The asset with the given ID was not found." });
 
   const validation = assetSchema.safeParse(req.body);
   if (!validation.success)
@@ -123,7 +129,9 @@ router.put("/:id", async (req, res) => {
   });
 
   if (assetWithTheSameName)
-    return res.status(400).send("The asset with this name is already exists.");
+    return res
+      .status(400)
+      .send({ message: "The asset with this name is already exists." });
 
   const updatedAsset = await prisma.asset.update({
     where: { id },
@@ -140,7 +148,9 @@ router.delete("/:id", async (req, res) => {
     where: { id },
   });
   if (!asset)
-    return res.status(404).send("The asset with the given ID was not found.");
+    return res
+      .status(404)
+      .send({ message: "The asset with the given ID was not found." });
 
   await prisma.asset.delete({ where: { id } });
 

@@ -44,7 +44,7 @@ export const importFromExcel = async (req: Request, res: Response) => {
       headers[1] !== "Name" &&
       headers[2] !== "New Name"
     )
-      return res.status(400).send({ error: "Invalid headers" });
+      return res.status(400).send({ message: "Invalid headers" });
 
     // getting data from
     await prisma.$transaction(async (tx) => {
