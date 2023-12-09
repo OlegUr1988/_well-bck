@@ -10,7 +10,9 @@ router.get("/", async (req, res) => {
     include: { asset: true },
   });
 
-  res.send(equipments);
+  const count = await prisma.equipment.count();
+
+  res.send({ count, results: equipments });
 });
 
 router.get("/:id", async (req, res) => {
