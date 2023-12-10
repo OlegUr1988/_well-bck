@@ -17,7 +17,18 @@ router.get(
     req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
     res: Response
   ) => {
-    const { page, pageSize } = req.query;
+    const { page, pageSize, searchedName } = req.query;
+
+    const where = {
+      OR: [
+        { name: { contains: searchedName } },
+        {
+          asset: {
+            name: { contains: searchedName },
+          },
+        },
+      ],
+    };
 
     const include = { asset: true };
 
@@ -28,12 +39,14 @@ router.get(
     const equipments =
       page && pageSize
         ? await prisma.equipment.findMany({
+            where,
             include,
             orderBy,
             skip: (parseInt(page) - 1) * parseInt(pageSize),
             take: parseInt(pageSize),
           })
         : await prisma.equipment.findMany({
+            where,
             include,
             orderBy,
           });
