@@ -1,23 +1,17 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
 import Asset from "../entities/Asset";
+import {
+  RequestBody,
+  RequestParams,
+  RequestQuery,
+  ResponseBody,
+} from "../entities/RequestQuery";
 import { exportToExcel, importFromExcel } from "../misc/excel/assets";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
 
 const router = express.Router();
-
-interface RequestParams {}
-
-interface ResponseBody {}
-
-interface RequestBody {}
-
-interface RequestQuery {
-  page: string;
-  pageSize: string;
-  searchedName: string;
-}
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
