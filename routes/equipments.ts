@@ -1,19 +1,51 @@
-import express from "express";
+import { Equipment } from "@prisma/client";
+import express, { Request, Response } from "express";
+import {
+  RequestBody,
+  RequestParams,
+  RequestQuery,
+  ResponseBody,
+} from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
 import { equipmentSchema } from "../schemas";
-import { Equipment } from "@prisma/client";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const equipments = await prisma.equipment.findMany({
-    include: { asset: true },
-  });
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
+    res: Response
+  ) => {
+    const { page, pageSize } = req.query;
 
-  const count = await prisma.equipment.count();
+    const include = { asset: true };
 
-  res.send({ count, results: equipments });
-});
+    const orderBy = { id: "asc" } as const;
+
+    const count = await prisma.equipment.count();
+
+    const equipments =
+      page && pageSize
+        ? await prisma.equipment.findMany({
+            include,
+            orderBy,
+            skip: (parseInt(page) - 1) * parseInt(pageSize),
+            take: parseInt(pageSize),
+          })
+        : await prisma.equipment.findMany({
+            include,
+            orderBy,
+          });
+
+    res.send({
+      count,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      results: equipments,
+    });
+  }
+);
 
 router.get("/:id", async (req, res) => {
   const equipment = await prisma.equipment.findUnique({
