@@ -71,7 +71,6 @@ export const importFromExcel = async (req: Request, res: Response) => {
 
     res.status(200).send();
   } catch (error) {
-    console.log(error);
-    res.status(500).send({ error });
+    res.status(500).send({ message: "An unexpected error occured.", error });
   }
 };
