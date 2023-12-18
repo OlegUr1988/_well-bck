@@ -6,8 +6,10 @@ import {
   RequestQuery,
   ResponseBody,
 } from "../entities/RequestQuery";
+import { exportToExcel, importFromExcel } from "../misc/excel/equipments";
 import { prisma } from "../prisma/client";
 import { equipmentSchema } from "../schemas";
+import { upload } from "../storage";
 
 const router = express.Router();
 
@@ -32,7 +34,7 @@ router.get(
 
     const include = { asset: true };
 
-    const orderBy = { id: "asc" } as const;
+    const orderBy = { name: "asc" } as const;
 
     const count = await prisma.equipment.count();
 
@@ -59,6 +61,10 @@ router.get(
     });
   }
 );
+
+router.get("/exportToExcel", (req, res) => {
+  exportToExcel(req, res);
+});
 
 router.get("/:id", async (req, res) => {
   const equipment = await prisma.equipment.findUnique({
@@ -100,6 +106,10 @@ router.post("/", async (req, res) => {
   });
 
   res.status(201).send(newEquipment);
+});
+
+router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
+  importFromExcel(req, res);
 });
 
 router.put("/:id", async (req, res) => {

@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import multer from "multer";
 import Asset from "../entities/Asset";
 import {
   RequestBody,
@@ -10,11 +9,9 @@ import {
 import { exportToExcel, importFromExcel } from "../misc/excel/assets";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
+import { upload } from "../storage";
 
 const router = express.Router();
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 router.get(
   "/",
@@ -30,7 +27,7 @@ router.get(
       },
     };
 
-    const orderBy = { id: "asc" } as const;
+    const orderBy = { name: "asc" } as const;
 
     const count = await prisma.asset.count();
 
@@ -56,7 +53,7 @@ router.get(
   }
 );
 
-router.get("/exportToExcel", async (req, res) => {
+router.get("/exportToExcel", (req, res) => {
   exportToExcel(req, res);
 });
 
@@ -93,13 +90,9 @@ router.post("/", async (req, res) => {
   res.status(201).send(newAsset);
 });
 
-router.post(
-  "/importFromExcel",
-  upload.single("excelFile"),
-  async (req, res) => {
-    importFromExcel(req, res);
-  }
-);
+router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
+  importFromExcel(req, res);
+});
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
