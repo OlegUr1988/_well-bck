@@ -1,7 +1,7 @@
 import ExcelJs, { Row } from "exceljs";
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/client";
-import { assetLogger, assetLogPath, deleteLog } from "../logger";
+import { assetLogger, assetsLogPath, deleteLog } from "../logger";
 
 export const exportToExcel = async (req: Request, res: Response) => {
   const workbook = new ExcelJs.Workbook();
@@ -33,7 +33,7 @@ export const importFromExcel = async (req: Request, res: Response) => {
     }
 
     // Deleting previous log file
-    deleteLog(assetLogPath);
+    deleteLog(assetsLogPath);
 
     const buffer = req.file.buffer;
     const workbook = new ExcelJs.Workbook();
@@ -56,18 +56,19 @@ export const importFromExcel = async (req: Request, res: Response) => {
 
     const rowsNumber = worksheet?.rowCount!;
 
-    // getting data from excel
+    // starting transaction
     await prisma.$transaction(async (tx) => {
       const rows = worksheet?.findRows(2, rowsNumber);
       if (rows)
         await Promise.all(
           rows?.map(async (row) => {
             const [item, name, newName] = row.values as string[];
+            const oldName = await tx.asset.findUnique({ where: { name } });
 
             if (newName) {
               if (newName.toLowerCase() === "delete") {
                 await tx.asset.delete({ where: { name } });
-                assetLogger.info(`The asset "${name} was deleted".`);
+                assetLogger.info(`The asset "${name}" was deleted.`);
               } else {
                 await tx.asset.update({
                   where: { name },
@@ -78,7 +79,6 @@ export const importFromExcel = async (req: Request, res: Response) => {
                 );
               }
             } else {
-              const oldName = await tx.asset.findUnique({ where: { name } });
               if (!oldName) {
                 await tx.asset.create({ data: { name } });
                 assetLogger.info(`The new "${name}" was added.`);
