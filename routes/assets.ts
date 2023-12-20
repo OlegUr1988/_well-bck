@@ -115,7 +115,7 @@ router.put("/:id", async (req, res) => {
     where: { name },
   });
 
-  if (assetWithTheSameName)
+  if (assetWithTheSameName && assetWithTheSameName.id !== id)
     return res
       .status(400)
       .send({ message: "The asset with this name is already exists." });

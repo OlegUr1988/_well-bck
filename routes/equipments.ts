@@ -137,7 +137,11 @@ router.put("/:id", async (req, res) => {
   const equipmentWithSameName = await prisma.equipment.findUnique({
     where: { name },
   });
-  if (equipmentWithSameName && equipmentWithSameName.name === name)
+  if (
+    equipmentWithSameName &&
+    equipmentWithSameName.name === name &&
+    equipmentWithSameName.id !== id
+  )
     return res
       .status(400)
       .send({ message: "The equipment with the same name already exist." });
