@@ -82,8 +82,9 @@ export const importFromExcel = async (req: Request, res: Response) => {
               if (!oldName) {
                 await tx.asset.create({ data: { name } });
                 assetLogger.info(`The new "${name}" was added.`);
+              } else {
+                assetLogger.info(`The asset "${name}" was not changed.`);
               }
-              assetLogger.info(`The asset "${name}" was not changed.`);
             }
           })
         );
