@@ -29,7 +29,7 @@ router.get(
 
     const orderBy = { name: "asc" } as const;
 
-    const count = await prisma.asset.count();
+    const count = (await prisma.asset.findMany({ where })).length;
 
     const assets =
       page && pageSize
