@@ -36,7 +36,7 @@ router.get(
 
     const orderBy = { name: "asc" } as const;
 
-    const count = await prisma.equipment.count();
+    const count = (await prisma.equipment.findMany({ where })).length;
 
     const equipments =
       page && pageSize
