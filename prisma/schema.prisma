@@ -45,3 +45,11 @@ model Query {
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
 }
+
+model PHDTag {
+  id          Int      @id @default(autoincrement())
+  tagname     String   @unique @db.VarChar(300)
+  description String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
