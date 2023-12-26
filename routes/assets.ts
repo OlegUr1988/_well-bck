@@ -1,11 +1,5 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import Asset from "../entities/Asset";
-import {
-  RequestBody,
-  RequestParams,
-  RequestQuery,
-  ResponseBody,
-} from "../entities/RequestQuery";
 import { exportToExcel, importFromExcel } from "../misc/excel/assets";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
@@ -13,49 +7,15 @@ import { upload } from "../storage";
 
 const router = express.Router();
 
-router.get(
-  "/",
-  async (
-    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
-    res: Response
-  ) => {
-    const { page, pageSize, searchedName } = req.query;
+router.get("/", async (req, res) => {
+  const assets = await prisma.asset.findMany();
 
-    const where = {
-      name: {
-        contains: searchedName,
-      },
-    };
-
-    const orderBy = { name: "asc" } as const;
-
-    const count = (await prisma.asset.findMany({ where })).length;
-
-    const assets =
-      page && pageSize
-        ? await prisma.asset.findMany({
-            where,
-            orderBy,
-            skip: (parseInt(page) - 1) * parseInt(pageSize),
-            take: parseInt(pageSize),
-          })
-        : await prisma.asset.findMany({
-            orderBy,
-            where,
-          });
-
-    res.send({
-      count,
-      page: parseInt(page),
-      pageSize: parseInt(pageSize),
-      results: assets,
-    });
-  }
-);
-
-router.get("/exportToExcel", (req, res) => {
-  exportToExcel(req, res);
+  res.send(assets);
 });
+
+// router.get("/exportToExcel", (req, res) => {
+//   exportToExcel(req, res);
+// });
 
 router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
@@ -90,9 +50,9 @@ router.post("/", async (req, res) => {
   res.status(201).send(newAsset);
 });
 
-router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
-  importFromExcel(req, res);
-});
+// router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
+//   importFromExcel(req, res);
+// });
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
