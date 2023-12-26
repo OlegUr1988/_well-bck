@@ -6,8 +6,10 @@ import {
   RequestQuery,
   ResponseBody,
 } from "../entities/RequestQuery";
+import { exportToExcel, importFromExcel } from "../misc/excel/PHDTags";
 import { prisma } from "../prisma/client";
 import { phdTagSchema } from "../schemas";
+import { upload } from "../storage";
 
 const router = express.Router();
 
@@ -51,6 +53,10 @@ router.get(
   }
 );
 
+router.get("/exportToExcel", (req, res) => {
+  exportToExcel(req, res);
+});
+
 router.get("/:id", async (req, res) => {
   const tag = await prisma.pHDTag.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -87,6 +93,10 @@ router.post("/", async (req, res) => {
   });
 
   res.status(201).send(newTag);
+});
+
+router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
+  importFromExcel(req, res);
 });
 
 router.put("/:id", async (req, res) => {

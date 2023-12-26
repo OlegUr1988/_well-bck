@@ -5,6 +5,7 @@ import moment from "moment";
 const basePath = "logs/";
 export const assetsLogPath = basePath + "assets-import.log";
 export const equipmentsLogPath = basePath + "equipments-import.log";
+export const PHDTagsLogPath = basePath + "PHDTags-import.log";
 
 const localTimestamp = () => {
   return moment().format("YYYY-MM-DD HH:mm:ss.SSS");
@@ -29,7 +30,7 @@ export const assetLogger = winston.createLogger({
   format,
   transports: [
     new winston.transports.File({
-      filename: "logs/assets-import.log",
+      filename: assetsLogPath,
     }),
   ],
 });
@@ -38,7 +39,16 @@ export const equipmentLogger = winston.createLogger({
   format,
   transports: [
     new winston.transports.File({
-      filename: "logs/equipments-import.log",
+      filename: equipmentsLogPath,
+    }),
+  ],
+});
+
+export const PHDTagLogger = winston.createLogger({
+  format,
+  transports: [
+    new winston.transports.File({
+      filename: PHDTagsLogPath,
     }),
   ],
 });
