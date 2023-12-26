@@ -12,7 +12,7 @@ app.use(cors);
 app.use(express.static("dist"));
 app.use("/api/assets", assets);
 app.use("/api/equipments", equipments);
-app.use("/api/phd-tags", PHDTags);
+// app.use("/api/phd-tags", PHDTags);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
