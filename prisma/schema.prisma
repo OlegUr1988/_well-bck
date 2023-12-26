@@ -11,45 +11,72 @@ datasource db {
 }
 
 model Asset {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique @db.VarChar(255)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
 
   equipment Equipment[]
 }
 
 model Equipment {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique @db.VarChar(255)
-  assetId    Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id      Int    @id @default(autoincrement())
+  name    String @unique @db.VarChar(255)
+  assetId Int
 
-  asset Asset @relation(fields: [assetId], references: [id])
+  asset Asset  @relation(fields: [assetId], references: [id])
+  part  Part[]
 }
 
-model QueryType {
-  id   Int     @id @default(autoincrement())
-  name String  @unique @db.VarChar(255)
-  link String? @db.VarChar(255)
+model Part {
+  id          Int    @id @default(autoincrement())
+  name        String @unique @db.VarChar(255)
+  equipmentId Int
 
-  queries Query[]
+  equipment Equipment  @relation(fields: [equipmentId], references: [id])
+  partLoss  PartLoss[]
 }
 
-model Query {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique @db.VarChar(255)
-  queryTypeId Int
-  queryType   QueryType @relation(fields: [queryTypeId], references: [id])
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+model PartLoss {
+  id     Int    @id @default(autoincrement())
+  name   String @unique @db.VarChar(255)
+  partId Int
+
+  part   Part     @relation(fields: [partId], references: [id])
+  PHDTag PHDTag[]
+}
+
+model Unit {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
+
+  PHDTag PHDTag[]
 }
 
 model PHDTag {
-  id          Int      @id @default(autoincrement())
-  tagname     String   @unique @db.VarChar(300)
-  description String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id         Int    @id @default(autoincrement())
+  tagname    String @unique @db.VarChar(300)
+  partLossId Int
+  unitId     Int
+
+  partLoss   PartLoss     @relation(fields: [partLossId], references: [id])
+  unit       Unit         @relation(fields: [unitId], references: [id])
+  loss       Loss[]
+  usefulWork UsefulWork[]
+}
+
+model Loss {
+  id        Int      @id @default(autoincrement())
+  value     Decimal
+  PHDTagId  Int
+  timestamp DateTime
+
+  PHDTag PHDTag @relation(fields: [PHDTagId], references: [id])
+}
+
+model UsefulWork {
+  id        Int      @id @default(autoincrement())
+  value     Decimal
+  PHDTagId  Int
+  timestamp DateTime
+
+  PHDTag PHDTag @relation(fields: [PHDTagId], references: [id])
 }
