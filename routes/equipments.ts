@@ -1,15 +1,38 @@
 import { Equipment } from "@prisma/client";
-import express from "express";
+import express, { Request, Response } from "express";
+import {
+  RequestBody,
+  RequestParams,
+  ResponseBody,
+} from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
 import { equipmentSchema } from "../schemas";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const equipments = await prisma.equipment.findMany({});
+interface EquipmentQuery {
+  assetId: string;
+}
 
-  res.send(equipments);
-});
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, EquipmentQuery>,
+    res: Response
+  ) => {
+    const { assetId } = req.query;
+
+    const where = assetId
+      ? {
+          assetId: parseInt(assetId),
+        }
+      : {};
+
+    const equipments = await prisma.equipment.findMany({ where });
+
+    res.send(equipments);
+  }
+);
 
 // router.get("/exportToExcel", (req, res) => {
 //   exportToExcel(req, res);
