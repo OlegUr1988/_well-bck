@@ -28,7 +28,7 @@ model Equipment {
 
 model Part {
   id          Int    @id @default(autoincrement())
-  name        String @unique @db.VarChar(255)
+  name        String @db.VarChar(255)
   equipmentId Int
 
   equipment Equipment  @relation(fields: [equipmentId], references: [id])
@@ -37,7 +37,7 @@ model Part {
 
 model PartLoss {
   id     Int    @id @default(autoincrement())
-  name   String @unique @db.VarChar(255)
+  name   String @db.VarChar(255)
   partId Int
 
   part   Part     @relation(fields: [partId], references: [id])
