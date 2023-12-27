@@ -1,70 +1,19 @@
 import { Equipment } from "@prisma/client";
-import express, { Request, Response } from "express";
-import {
-  RequestBody,
-  RequestParams,
-  RequestQuery,
-  ResponseBody,
-} from "../entities/RequestQuery";
-import { exportToExcel, importFromExcel } from "../misc/excel/equipments";
+import express from "express";
 import { prisma } from "../prisma/client";
 import { equipmentSchema } from "../schemas";
-import { upload } from "../storage";
 
 const router = express.Router();
 
-router.get(
-  "/",
-  async (
-    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
-    res: Response
-  ) => {
-    const { page, pageSize, searchedName } = req.query;
+router.get("/", async (req, res) => {
+  const equipments = await prisma.equipment.findMany({});
 
-    const where = {
-      OR: [
-        { name: { contains: searchedName } },
-        {
-          asset: {
-            name: { contains: searchedName },
-          },
-        },
-      ],
-    };
-
-    const include = { asset: true };
-
-    const orderBy = { name: "asc" } as const;
-
-    const count = (await prisma.equipment.findMany({ where })).length;
-
-    const equipments =
-      page && pageSize
-        ? await prisma.equipment.findMany({
-            where,
-            include,
-            orderBy,
-            skip: (parseInt(page) - 1) * parseInt(pageSize),
-            take: parseInt(pageSize),
-          })
-        : await prisma.equipment.findMany({
-            where,
-            include,
-            orderBy,
-          });
-
-    res.send({
-      count,
-      page: parseInt(page),
-      pageSize: parseInt(pageSize),
-      results: equipments,
-    });
-  }
-);
-
-router.get("/exportToExcel", (req, res) => {
-  exportToExcel(req, res);
+  res.send(equipments);
 });
+
+// router.get("/exportToExcel", (req, res) => {
+//   exportToExcel(req, res);
+// });
 
 router.get("/:id", async (req, res) => {
   const equipment = await prisma.equipment.findUnique({
@@ -108,9 +57,9 @@ router.post("/", async (req, res) => {
   res.status(201).send(newEquipment);
 });
 
-router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
-  importFromExcel(req, res);
-});
+// router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
+//   importFromExcel(req, res);
+// });
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
