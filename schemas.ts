@@ -9,6 +9,11 @@ export const equipmentSchema = z.object({
   assetId: z.number().min(1),
 });
 
+export const partSchema = z.object({
+  name: z.string().min(1).max(255),
+  equipmentId: z.number().min(1),
+});
+
 export const phdTagSchema = z.object({
   tagname: z.string().min(1).max(300),
   description: z.string(),
