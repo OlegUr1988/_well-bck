@@ -60,7 +60,7 @@ router.post("/", async (req, res) => {
 
   const asset = await prisma.asset.findUnique({ where: { id: assetId } });
   if (!asset)
-    return res.status(400).send({ message: "Invalid asset provided" });
+    return res.status(400).send({ message: "Invalid asset was provided" });
 
   const equipmentWithSameName = await prisma.equipment.findUnique({
     where: { name },
