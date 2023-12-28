@@ -3,6 +3,7 @@ import assets from "./routes/assets";
 import equipments from "./routes/equipments";
 import PHDTags from "./routes/PHDTags";
 import parts from "./routes/parts";
+import units from "./routes/units";
 import cors from "./middlewares/cors";
 import path from "path";
 
@@ -14,6 +15,7 @@ app.use(express.static("dist"));
 app.use("/api/assets", assets);
 app.use("/api/equipments", equipments);
 app.use("/api/parts", parts);
+app.use("/api/units", units);
 // app.use("/api/phd-tags", PHDTags);
 
 app.get("*", (req, res) => {
