@@ -6,10 +6,10 @@ import {
   RequestQuery,
   ResponseBody,
 } from "../entities/RequestQuery";
-import { exportToExcel, importFromExcel } from "../misc/excel/PHDTags";
+// import { exportToExcel, importFromExcel } from "../misc/excel/PHDTags";
 import { prisma } from "../prisma/client";
 import { phdTagSchema } from "../schemas";
-import { upload } from "../storage";
+// import { upload } from "../storage";
 
 const router = express.Router();
 
@@ -53,9 +53,9 @@ router.get(
   }
 );
 
-router.get("/exportToExcel", (req, res) => {
-  exportToExcel(req, res);
-});
+// router.get("/exportToExcel", (req, res) => {
+//   exportToExcel(req, res);
+// });
 
 router.get("/:id", async (req, res) => {
   const tag = await prisma.pHDTag.findUnique({
@@ -74,7 +74,7 @@ router.post("/", async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { tagname, description } = req.body as PHDTag;
+  const { tagname, partParameterId, unitId } = req.body as PHDTag;
 
   const sameTagname = await prisma.pHDTag.findUnique({
     where: { tagname },
@@ -87,17 +87,16 @@ router.post("/", async (req, res) => {
 
   const newTag = await prisma.pHDTag.create({
     data: {
-      tagname,
-      description,
+      tagname, unitId, partParameterId
     },
   });
 
   res.status(201).send(newTag);
 });
 
-router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
-  importFromExcel(req, res);
-});
+// router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
+//   importFromExcel(req, res);
+// });
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
@@ -114,7 +113,7 @@ router.put("/:id", async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { tagname, description } = req.body as PHDTag;
+  const { tagname, partParameterId, unitId } = req.body as PHDTag;
 
   const sameTagname = await prisma.pHDTag.findUnique({
     where: { tagname },
@@ -129,7 +128,8 @@ router.put("/:id", async (req, res) => {
     where: { id },
     data: {
       tagname,
-      description,
+      partParameterId,
+      unitId
     },
   });
 
