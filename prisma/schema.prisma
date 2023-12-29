@@ -31,17 +31,26 @@ model Part {
   name        String @db.VarChar(255)
   equipmentId Int
 
-  equipment Equipment  @relation(fields: [equipmentId], references: [id])
-  partLoss  PartLoss[]
+  equipment Equipment       @relation(fields: [equipmentId], references: [id])
+  partLoss  PartParameter[]
 }
 
-model PartLoss {
-  id     Int    @id @default(autoincrement())
-  name   String @db.VarChar(255)
-  partId Int
+model ParameterType {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
 
-  part   Part     @relation(fields: [partId], references: [id])
-  PHDTag PHDTag[]
+  partParameter PartParameter[]
+}
+
+model PartParameter {
+  id              Int    @id @default(autoincrement())
+  name            String @db.VarChar(255)
+  partId          Int
+  parameterTypeId Int
+
+  part          Part          @relation(fields: [partId], references: [id])
+  parameterType ParameterType @relation(fields: [parameterTypeId], references: [id])
+  PHDTag        PHDTag[]
 }
 
 model Unit {
@@ -51,37 +60,18 @@ model Unit {
   PHDTag PHDTag[]
 }
 
-model PHDTagType {
-  id   Int    @id @default(autoincrement())
-  name String @unique @db.VarChar(255)
-
-  PHDTag PHDTag[]
-}
-
 model PHDTag {
-  id           Int        @id @default(autoincrement())
-  tagname      String     @unique @db.VarChar(300)
-  partLossId   Int
-  unitId       Int
-  PHDTagTypeId Int
-  PHDTagType   PHDTagType @relation(fields: [PHDTagTypeId], references: [id])
+  id              Int    @id @default(autoincrement())
+  tagname         String @unique @db.VarChar(300)
+  partParameterId Int
+  unitId          Int
 
-  partLoss   PartLoss     @relation(fields: [partLossId], references: [id])
-  unit       Unit         @relation(fields: [unitId], references: [id])
-  loss       Loss[]
-  usefulWork UsefulWork[]
+  partParameter PartParameter @relation(fields: [partParameterId], references: [id])
+  unit          Unit          @relation(fields: [unitId], references: [id])
+  record        Record[]
 }
 
-model Loss {
-  id        Int      @id @default(autoincrement())
-  value     Decimal
-  PHDTagId  Int
-  timestamp DateTime
-
-  PHDTag PHDTag @relation(fields: [PHDTagId], references: [id])
-}
-
-model UsefulWork {
+model Record {
   id        Int      @id @default(autoincrement())
   value     Decimal
   PHDTagId  Int
