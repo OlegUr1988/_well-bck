@@ -51,11 +51,20 @@ model Unit {
   PHDTag PHDTag[]
 }
 
+model PHDTagType {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
+
+  PHDTag PHDTag[]
+}
+
 model PHDTag {
-  id         Int    @id @default(autoincrement())
-  tagname    String @unique @db.VarChar(300)
-  partLossId Int
-  unitId     Int
+  id           Int        @id @default(autoincrement())
+  tagname      String     @unique @db.VarChar(300)
+  partLossId   Int
+  unitId       Int
+  PHDTagTypeId Int
+  PHDTagType   PHDTagType @relation(fields: [PHDTagTypeId], references: [id])
 
   partLoss   PartLoss     @relation(fields: [partLossId], references: [id])
   unit       Unit         @relation(fields: [unitId], references: [id])
