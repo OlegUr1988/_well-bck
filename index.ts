@@ -5,6 +5,7 @@ import PHDTags from "./routes/PHDTags";
 import parts from "./routes/parts";
 import units from "./routes/units";
 import parameterTypes from "./routes/parameterType";
+import partParams from "./routes/partParameters";
 import cors from "./middlewares/cors";
 import path from "path";
 
@@ -18,6 +19,7 @@ app.use("/api/equipments", equipments);
 app.use("/api/parts", parts);
 app.use("/api/units", units);
 app.use("/api/parameter-types", parameterTypes);
+app.use("/api/part-parameters", partParams);
 // app.use("/api/phd-tags", PHDTags);
 
 app.get("*", (req, res) => {

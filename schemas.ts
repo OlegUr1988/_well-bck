@@ -14,9 +14,16 @@ export const partSchema = z.object({
   equipmentId: z.number().min(1),
 });
 
+export const partParameterSchema = z.object({
+  name: z.string().min(1).max(255),
+  partId: z.number().min(1),
+  parameterTypeId: z.number().min(1),
+});
+
 export const phdTagSchema = z.object({
   tagname: z.string().min(1).max(300),
-  description: z.string(),
+  partParameterId: z.number().min(1),
+  unitId: z.number().min(1),
 });
 
 export const unitSchema = z.object({

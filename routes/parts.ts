@@ -1,4 +1,3 @@
-import { Part } from "@prisma/client";
 import express, { Request, Response } from "express";
 import {
   RequestBody,
@@ -7,6 +6,7 @@ import {
 } from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
 import { partSchema } from "../schemas";
+import Part from "../entities/Part";
 
 const router = express.Router();
 
