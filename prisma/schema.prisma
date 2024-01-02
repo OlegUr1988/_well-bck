@@ -50,7 +50,7 @@ model PartParameter {
 
   part          Part          @relation(fields: [partId], references: [id])
   parameterType ParameterType @relation(fields: [parameterTypeId], references: [id])
-  PHDTag        PHDTag[]
+  assignment    Assignment[]
 }
 
 model Unit {
@@ -61,14 +61,23 @@ model Unit {
 }
 
 model PHDTag {
-  id              Int    @id @default(autoincrement())
-  tagname         String @unique @db.VarChar(300)
+  id      Int    @id @default(autoincrement())
+  tagname String @unique @db.VarChar(300)
+  unitId  Int
+
+  unit       Unit         @relation(fields: [unitId], references: [id])
+  record     Record[]
+  assignment Assignment[]
+}
+
+model Assignment {
   partParameterId Int
-  unitId          Int
+  PHDTagId        Int
 
   partParameter PartParameter @relation(fields: [partParameterId], references: [id])
-  unit          Unit          @relation(fields: [unitId], references: [id])
-  record        Record[]
+  PHDTag        PHDTag        @relation(fields: [PHDTagId], references: [id])
+
+  @@id([partParameterId, PHDTagId])
 }
 
 model Record {

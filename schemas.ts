@@ -22,7 +22,6 @@ export const partParameterSchema = z.object({
 
 export const phdTagSchema = z.object({
   tagname: z.string().min(1).max(300),
-  partParameterId: z.number().min(1),
   unitId: z.number().min(1),
 });
 

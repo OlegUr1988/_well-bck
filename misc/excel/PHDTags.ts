@@ -7,11 +7,11 @@ export const exportToExcel = async (req: Request, res: Response) => {
   const workbook = new ExcelJs.Workbook();
   const worksheet = workbook.addWorksheet("PHD Tags");
 
-  worksheet.addRow(["Tagname", "New Tagname", "Description"]);
+  worksheet.addRow(["Tagname", "New Tagname", "Units"]);
 
-  const tags = await prisma.pHDTag.findMany();
+  const tags = await prisma.pHDTag.findMany({ include: { unit: true } });
 
-  tags.map((tag) => worksheet.addRow([tag.tagname, "", tag.description]));
+  tags.map((tag) => worksheet.addRow([tag.tagname, "", tag.unit.name]));
 
   // Set response headers
   res.setHeader(
@@ -63,11 +63,15 @@ export const importFromExcel = async (req: Request, res: Response) => {
       if (rows)
         await Promise.all(
           rows.map(async (row) => {
-            const [item, tagname, newTagname, description] =
+            const [item, tagname, newTagname, unitsName] =
               row.values as string[];
 
             const oldTagname = await tx.pHDTag.findUnique({
               where: { tagname },
+            });
+
+            const units = await prisma.unit.findUnique({
+              where: { name: unitsName },
             });
 
             if (newTagname) {
@@ -79,7 +83,7 @@ export const importFromExcel = async (req: Request, res: Response) => {
                   where: { tagname },
                   data: {
                     tagname: newTagname,
-                    description,
+                    unitId: units?.id,
                   },
                 });
                 PHDTagLogger.info(`The PHD tag "${tagname}" was updated`);
@@ -87,13 +91,13 @@ export const importFromExcel = async (req: Request, res: Response) => {
             } else {
               if (!oldTagname) {
                 await tx.pHDTag.create({
-                  data: { tagname, description },
+                  data: { tagname, unitId: units?.id! },
                 });
                 PHDTagLogger.info(`The PHD tag "${tagname}" was added`);
-              } else if (oldTagname.description !== description) {
+              } else if (oldTagname.unitId !== units?.id) {
                 await tx.pHDTag.update({
                   where: { id: oldTagname.id },
-                  data: { description },
+                  data: { unitId: units?.id! },
                 });
                 PHDTagLogger.info(`The PHD tag "${tagname}" was updated`);
               } else {
