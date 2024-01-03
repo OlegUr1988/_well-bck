@@ -6,6 +6,7 @@ import parts from "./routes/parts";
 import units from "./routes/units";
 import parameterTypes from "./routes/parameterType";
 import partParams from "./routes/partParameters";
+import assignments from "./routes/assignments";
 import cors from "./middlewares/cors";
 import path from "path";
 
@@ -21,6 +22,7 @@ app.use("/api/units", units);
 app.use("/api/parameter-types", parameterTypes);
 app.use("/api/part-parameters", partParams);
 app.use("/api/phd-tags", PHDTags);
+app.use("/api/assignments", assignments);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
