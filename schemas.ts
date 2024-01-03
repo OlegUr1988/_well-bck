@@ -28,3 +28,12 @@ export const phdTagSchema = z.object({
 export const unitSchema = z.object({
   name: z.string().min(1).max(255),
 });
+
+export const assignmentSchema = z.object({
+  partParameterId: z.number().min(1),
+  PHDTagId: z.number().min(1),
+});
+
+export const updateAssignmentSchema = z.object({
+  PHDTagId: z.number().min(1),
+});
