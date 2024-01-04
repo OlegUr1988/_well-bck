@@ -5,16 +5,16 @@ import { assignmentSchema, updateAssignmentSchema } from "../schemas";
 const router = express.Router();
 
 interface AssignmentQuery {
-  partParameterId: number;
+  attributeId: number;
   PHDTagId: number;
 }
 
-router.get("/:partParameterId", async (req, res) => {
-  const { partParameterId } = req.params;
+router.get("/:attrId", async (req, res) => {
+  const { attrId } = req.params;
 
   const assignments = await prisma.assignment.findMany({
     where: {
-      partParameterId: parseInt(partParameterId),
+      attributeId: parseInt(attrId),
     },
     include: { PHDTag: true },
   });
@@ -27,11 +27,11 @@ router.post("/", async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { partParameterId, PHDTagId } = req.body as AssignmentQuery;
+  const { attributeId, PHDTagId } = req.body as AssignmentQuery;
 
   const existingAssignment = await prisma.assignment.findUnique({
     where: {
-      partParameterId_PHDTagId: { partParameterId, PHDTagId },
+      attributeId_PHDTagId: { attributeId, PHDTagId },
     },
   });
 
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 
   const newAssignment = await prisma.assignment.create({
     data: {
-      partParameterId,
+      attributeId,
       PHDTagId,
     },
   });
@@ -50,15 +50,15 @@ router.post("/", async (req, res) => {
   res.status(201).send(newAssignment);
 });
 
-router.put("/:paramId/:tagId", async (req, res) => {
-  const { paramId, tagId } = req.params;
-  const parameterId = parseInt(paramId);
+router.put("/:attrId/:tagId", async (req, res) => {
+  const { attrId, tagId } = req.params;
+  const attributeId = parseInt(attrId);
   const tag = parseInt(tagId);
 
   const assignment = await prisma.assignment.findUnique({
     where: {
-      partParameterId_PHDTagId: {
-        partParameterId: parameterId,
+      attributeId_PHDTagId: {
+        attributeId,
         PHDTagId: tag,
       },
     },
@@ -77,8 +77,8 @@ router.put("/:paramId/:tagId", async (req, res) => {
 
   const existingAssignment = await prisma.assignment.findUnique({
     where: {
-      partParameterId_PHDTagId: {
-        partParameterId: parameterId,
+      attributeId_PHDTagId: {
+        attributeId,
         PHDTagId,
       },
     },
@@ -91,8 +91,8 @@ router.put("/:paramId/:tagId", async (req, res) => {
 
   const updatedAssignment = await prisma.assignment.update({
     where: {
-      partParameterId_PHDTagId: {
-        partParameterId: parameterId,
+      attributeId_PHDTagId: {
+        attributeId,
         PHDTagId: tag,
       },
     },
@@ -104,15 +104,15 @@ router.put("/:paramId/:tagId", async (req, res) => {
   res.send(updatedAssignment);
 });
 
-router.delete("/:paramId/:tagId", async (req, res) => {
-  const { paramId, tagId } = req.params;
-  const parameterId = parseInt(paramId);
+router.delete("/:attrId/:tagId", async (req, res) => {
+  const { attrId, tagId } = req.params;
+  const attributeId = parseInt(attrId);
   const tag = parseInt(tagId);
 
   const assignment = await prisma.assignment.findUnique({
     where: {
-      partParameterId_PHDTagId: {
-        partParameterId: parameterId,
+      attributeId_PHDTagId: {
+        attributeId,
         PHDTagId: tag,
       },
     },
@@ -123,16 +123,16 @@ router.delete("/:paramId/:tagId", async (req, res) => {
       .status(404)
       .send("The assignment with the given parameters was not found");
 
-  const deletedAssignment = await prisma.assignment.delete({
+  await prisma.assignment.delete({
     where: {
-      partParameterId_PHDTagId: {
-        partParameterId: parameterId,
+      attributeId_PHDTagId: {
+        attributeId,
         PHDTagId: tag,
       },
     },
   });
 
-  res.send(deletedAssignment);
+  res.send(assignment);
 });
 
 export default router;

@@ -34,10 +34,6 @@ router.get(
   }
 );
 
-// router.get("/exportToExcel", (req, res) => {
-//   exportToExcel(req, res);
-// });
-
 router.get("/:id", async (req, res) => {
   const equipment = await prisma.equipment.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -58,31 +54,21 @@ router.post("/", async (req, res) => {
 
   const { name, assetId } = req.body as Equipment;
 
-  const asset = await prisma.asset.findUnique({ where: { id: assetId } });
+  const asset = await prisma.asset.findUnique({
+    where: { id: assetId },
+  });
   if (!asset)
     return res.status(400).send({ message: "Invalid asset was provided" });
-
-  const equipmentWithSameName = await prisma.equipment.findUnique({
-    where: { name },
-  });
-  if (equipmentWithSameName)
-    return res
-      .status(400)
-      .send({ message: "The equipment with the same name already exist." });
 
   const newEquipment = await prisma.equipment.create({
     data: {
       name,
-      assetId,
+       assetId,
     },
   });
 
   res.status(201).send(newEquipment);
 });
-
-// router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
-//   importFromExcel(req, res);
-// });
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
@@ -102,21 +88,11 @@ router.put("/:id", async (req, res) => {
 
   const { name, assetId } = req.body as Equipment;
 
-  const asset = await prisma.asset.findUnique({ where: { id: assetId } });
-  if (!asset)
-    return res.status(400).send({ message: "Invalid asset provided" });
-
-  const equipmentWithSameName = await prisma.equipment.findUnique({
-    where: { name },
+  const asset = await prisma.asset.findUnique({
+    where: { id: assetId },
   });
-  if (
-    equipmentWithSameName &&
-    equipmentWithSameName.name === name &&
-    equipmentWithSameName.id !== id
-  )
-    return res
-      .status(400)
-      .send({ message: "The equipment with the same name already exist." });
+  if (!equipment)
+    return res.status(400).send({ message: "Invalid asset was provided" });
 
   const updatedEquipment = await prisma.equipment.update({
     where: { id },
@@ -137,9 +113,9 @@ router.delete("/:id", async (req, res) => {
       .status(404)
       .send({ message: "The equipment with the given ID was not found." });
 
-  const deletedEquipment = await prisma.equipment.delete({ where: { id } });
+  await prisma.equipment.delete({ where: { id } });
 
-  res.send(deletedEquipment);
+  res.send(equipment);
 });
 
 export default router;

@@ -63,9 +63,9 @@ CREATE TABLE [dbo].[PHDTag] (
 
 -- CreateTable
 CREATE TABLE [dbo].[Assignment] (
-    [attributeTypeId] INT NOT NULL,
+    [attributeId] INT NOT NULL,
     [PHDTagId] INT NOT NULL,
-    CONSTRAINT [Assignment_pkey] PRIMARY KEY CLUSTERED ([attributeTypeId],[PHDTagId])
+    CONSTRAINT [Assignment_pkey] PRIMARY KEY CLUSTERED ([attributeId],[PHDTagId])
 );
 
 -- CreateTable
@@ -93,7 +93,7 @@ ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [Attribute_attributeTypeId_fkey] FO
 ALTER TABLE [dbo].[PHDTag] ADD CONSTRAINT [PHDTag_unitId_fkey] FOREIGN KEY ([unitId]) REFERENCES [dbo].[Unit]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Assignment] ADD CONSTRAINT [Assignment_attributeTypeId_fkey] FOREIGN KEY ([attributeTypeId]) REFERENCES [dbo].[Attribute]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Assignment] ADD CONSTRAINT [Assignment_attributeId_fkey] FOREIGN KEY ([attributeId]) REFERENCES [dbo].[Attribute]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[Assignment] ADD CONSTRAINT [Assignment_PHDTagId_fkey] FOREIGN KEY ([PHDTagId]) REFERENCES [dbo].[PHDTag]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;

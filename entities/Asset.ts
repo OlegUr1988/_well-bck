@@ -1,4 +1,4 @@
 export default interface Asset {
   name: string;
-  assetId: number;
+  areaId: number;
 }

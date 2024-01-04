@@ -4,20 +4,20 @@ export const areaSchema = z.object({
   name: z.string().min(1).max(255),
 });
 
+export const assetSchema = z.object({
+  name: z.string().min(1).max(255),
+  areaId: z.number().min(1),
+});
+
 export const equipmentSchema = z.object({
   name: z.string().min(1).max(255),
   assetId: z.number().min(1),
 });
 
-export const partSchema = z.object({
+export const attributeSchema = z.object({
   name: z.string().min(1).max(255),
   equipmentId: z.number().min(1),
-});
-
-export const partParameterSchema = z.object({
-  name: z.string().min(1).max(255),
-  partId: z.number().min(1),
-  parameterTypeId: z.number().min(1),
+  attributeTypeId: z.number().min(1),
 });
 
 export const phdTagSchema = z.object({
@@ -30,7 +30,7 @@ export const unitSchema = z.object({
 });
 
 export const assignmentSchema = z.object({
-  partParameterId: z.number().min(1),
+  attributeId: z.number().min(1),
   PHDTagId: z.number().min(1),
 });
 

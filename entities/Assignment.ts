@@ -1,4 +1,4 @@
 export default interface Assignment {
-  partParameterId: number;
+  attributeId: number;
   PHDTagId: number;
 }

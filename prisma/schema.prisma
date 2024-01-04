@@ -71,13 +71,13 @@ model PHDTag {
 }
 
 model Assignment {
-  attributeTypeId Int
-  PHDTagId        Int
+  attributeId Int
+  PHDTagId    Int
 
-  attribute Attribute @relation(fields: [attributeTypeId], references: [id])
+  attribute Attribute @relation(fields: [attributeId], references: [id])
   PHDTag    PHDTag    @relation(fields: [PHDTagId], references: [id])
 
-  @@id([attributeTypeId, PHDTagId])
+  @@id([attributeId, PHDTagId])
 }
 
 model Record {
