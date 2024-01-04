@@ -1,5 +1,5 @@
 import express from "express";
-import assets from "./routes/assets";
+import areas from "./routes/areas";
 import equipments from "./routes/equipments";
 import PHDTags from "./routes/PHDTags";
 import parts from "./routes/parts";
@@ -15,14 +15,14 @@ const app = express();
 app.use(express.json());
 app.use(cors);
 app.use(express.static("dist"));
-app.use("/api/assets", assets);
-app.use("/api/equipments", equipments);
-app.use("/api/parts", parts);
-app.use("/api/units", units);
-app.use("/api/parameter-types", parameterTypes);
-app.use("/api/part-parameters", partParams);
-app.use("/api/phd-tags", PHDTags);
-app.use("/api/assignments", assignments);
+app.use("/api/areas", areas);
+// app.use("/api/equipments", equipments);
+// app.use("/api/parts", parts);
+// app.use("/api/units", units);
+// app.use("/api/parameter-types", parameterTypes);
+// app.use("/api/part-parameters", partParams);
+// app.use("/api/phd-tags", PHDTags);
+// app.use("/api/assignments", assignments);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));

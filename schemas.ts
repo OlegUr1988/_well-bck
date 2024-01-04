@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const assetSchema = z.object({
+export const areaSchema = z.object({
   name: z.string().min(1).max(255),
 });
 
