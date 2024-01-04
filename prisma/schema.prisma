@@ -10,46 +10,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Asset {
+model Area {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
 
+  asset Asset[]
+}
+
+model Asset {
+  id     Int    @id @default(autoincrement())
+  name   String @unique @db.VarChar(255)
+  areaId Int
+
+  area      Area        @relation(fields: [areaId], references: [id])
   equipment Equipment[]
 }
 
 model Equipment {
   id      Int    @id @default(autoincrement())
-  name    String @unique @db.VarChar(255)
+  name    String @db.VarChar(255)
   assetId Int
 
-  asset Asset  @relation(fields: [assetId], references: [id])
-  part  Part[]
+  asset     Asset       @relation(fields: [assetId], references: [id])
+  attribute Attribute[]
 }
 
-model Part {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(255)
-  equipmentId Int
-
-  equipment Equipment       @relation(fields: [equipmentId], references: [id])
-  partLoss  PartParameter[]
-}
-
-model ParameterType {
+model AttributeType {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
 
-  partParameter PartParameter[]
+  attribute Attribute[]
 }
 
-model PartParameter {
+model Attribute {
   id              Int    @id @default(autoincrement())
   name            String @db.VarChar(255)
-  partId          Int
-  parameterTypeId Int
+  equipmentId     Int
+  attributeTypeId Int
 
-  part          Part          @relation(fields: [partId], references: [id])
-  parameterType ParameterType @relation(fields: [parameterTypeId], references: [id])
+  equipment     Equipment     @relation(fields: [equipmentId], references: [id])
+  attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
   assignment    Assignment[]
 }
 
@@ -71,13 +71,13 @@ model PHDTag {
 }
 
 model Assignment {
-  partParameterId Int
-  PHDTagId        Int
+  attributeId Int
+  PHDTagId    Int
 
-  partParameter PartParameter @relation(fields: [partParameterId], references: [id])
-  PHDTag        PHDTag        @relation(fields: [PHDTagId], references: [id])
+  attribute Attribute @relation(fields: [attributeId], references: [id])
+  PHDTag    PHDTag    @relation(fields: [PHDTagId], references: [id])
 
-  @@id([partParameterId, PHDTagId])
+  @@id([attributeId, PHDTagId])
 }
 
 model Record {

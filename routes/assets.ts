@@ -1,23 +1,43 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import Asset from "../entities/Asset";
+import {
+  RequestBody,
+  RequestParams,
+  ResponseBody,
+} from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const assets = await prisma.asset.findMany();
+interface AssetQuery {
+  areaId: string;
+}
 
-  res.send(assets);
-});
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, AssetQuery>,
+    res: Response
+  ) => {
+    const { areaId } = req.query;
 
-// router.get("/exportToExcel", (req, res) => {
-//   exportToExcel(req, res);
-// });
+    const where = areaId
+      ? {
+          areaId: parseInt(areaId),
+        }
+      : {};
+
+    const assets = await prisma.asset.findMany({ where });
+
+    res.send(assets);
+  }
+);
 
 router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
     where: { id: parseInt(req.params.id) },
+    include: { area: true },
   });
   if (!asset)
     return res
@@ -32,31 +52,36 @@ router.post("/", async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name } = req.body as Asset;
+  const { name, areaId } = req.body as Asset;
 
-  const assetWithTheSameName = await prisma.asset.findUnique({
+  const area = await prisma.area.findUnique({ where: { id: areaId } });
+  if (!area)
+    return res.status(400).send({ message: "Invalid area was provided" });
+
+  const assetWithSameName = await prisma.asset.findUnique({
     where: { name },
   });
-
-  if (assetWithTheSameName)
+  if (assetWithSameName)
     return res
       .status(400)
-      .send({ message: "The asset with this name is already exists." });
+      .send({ message: "The asset with the same name already exist." });
 
-  const newAsset = await prisma.asset.create({ data: { name } });
+  const newAsset = await prisma.asset.create({
+    data: {
+      name,
+      areaId,
+    },
+  });
 
   res.status(201).send(newAsset);
 });
-
-// router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
-//   importFromExcel(req, res);
-// });
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
 
   const asset = await prisma.asset.findUnique({
     where: { id },
+    include: { area: true },
   });
   if (!asset)
     return res
@@ -67,23 +92,30 @@ router.put("/:id", async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name } = req.body as Asset;
+  const { name, areaId } = req.body as Asset;
 
-  const assetWithTheSameName = await prisma.asset.findUnique({
+  const area = await prisma.area.findUnique({ where: { id: areaId } });
+  if (!asset)
+    return res.status(400).send({ message: "Invalid area was provided" });
+
+  const assetWithSameName = await prisma.asset.findUnique({
     where: { name },
   });
-
-  if (assetWithTheSameName && assetWithTheSameName.id !== id)
+  if (
+    assetWithSameName &&
+    assetWithSameName.name === name &&
+    assetWithSameName.id !== id
+  )
     return res
       .status(400)
-      .send({ message: "The asset with this name is already exists." });
+      .send({ message: "The asset with the same name already exist." });
 
   const updatedAsset = await prisma.asset.update({
     where: { id },
-    data: { name },
+    data: { name, areaId },
   });
 
-  res.status(200).send(updatedAsset);
+  res.send(updatedAsset);
 });
 
 router.delete("/:id", async (req, res) => {

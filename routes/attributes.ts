@@ -1,23 +1,23 @@
 import express, { Request, Response } from "express";
+import Attribute from "../entities/Attribute";
 import {
   RequestBody,
   RequestParams,
   ResponseBody,
 } from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
-import { partSchema } from "../schemas";
-import Part from "../entities/Part";
+import { attributeSchema } from "../schemas";
 
 const router = express.Router();
 
-interface PartQuery {
+interface AttributeQuery {
   equipmentId: string;
 }
 
 router.get(
   "/",
   async (
-    req: Request<RequestParams, ResponseBody, RequestBody, PartQuery>,
+    req: Request<RequestParams, ResponseBody, RequestBody, AttributeQuery>,
     res: Response
   ) => {
     const { equipmentId } = req.query;
@@ -28,31 +28,31 @@ router.get(
         }
       : {};
 
-    const parts = await prisma.part.findMany({ where });
+    const params = await prisma.attribute.findMany({ where });
 
-    res.send(parts);
+    res.send(params);
   }
 );
 
 router.get("/:id", async (req, res) => {
-  const part = await prisma.part.findUnique({
+  const attribute = await prisma.attribute.findUnique({
     where: { id: parseInt(req.params.id) },
     include: { equipment: true },
   });
-  if (!part)
+  if (!attribute)
     return res
       .status(404)
-      .send({ message: "The equipment part with the given ID was not found." });
+      .send({ message: "The attribute with the given ID was not found." });
 
-  res.send(part);
+  res.send(attribute);
 });
 
 router.post("/", async (req, res) => {
-  const validation = partSchema.safeParse(req.body);
+  const validation = attributeSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, equipmentId } = req.body as Part;
+  const { name, equipmentId, attributeTypeId } = req.body as Attribute;
 
   const equipment = await prisma.equipment.findUnique({
     where: { id: equipmentId },
@@ -60,33 +60,34 @@ router.post("/", async (req, res) => {
   if (!equipment)
     return res.status(400).send({ message: "Invalid equipment was provided" });
 
-  const newPart = await prisma.part.create({
+  const newAttribute = await prisma.attribute.create({
     data: {
       name,
       equipmentId,
+      attributeTypeId,
     },
   });
 
-  res.status(201).send(newPart);
+  res.status(201).send(newAttribute);
 });
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
 
-  const part = await prisma.part.findUnique({
+  const attribute = await prisma.attribute.findUnique({
     where: { id },
     include: { equipment: true },
   });
-  if (!part)
+  if (!attribute)
     return res
       .status(404)
-      .send({ message: "The equipment part with the given ID was not found." });
+      .send({ message: "The attribute with the given ID was not found." });
 
-  const validation = partSchema.safeParse(req.body);
+  const validation = attributeSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, equipmentId } = req.body as Part;
+  const { name, equipmentId, attributeTypeId } = req.body as Attribute;
 
   const equipment = await prisma.equipment.findUnique({
     where: { id: equipmentId },
@@ -94,28 +95,28 @@ router.put("/:id", async (req, res) => {
   if (!equipment)
     return res.status(400).send({ message: "Invalid equipment was provided" });
 
-  const updatedPart = await prisma.part.update({
+  const updatedAttribute = await prisma.attribute.update({
     where: { id },
-    data: { name, equipmentId },
+    data: { name, equipmentId, attributeTypeId },
   });
 
-  res.send(updatedPart);
+  res.send(updatedAttribute);
 });
 
 router.delete("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
 
-  const part = await prisma.part.findUnique({
+  const attribute = await prisma.attribute.findUnique({
     where: { id },
   });
-  if (!part)
+  if (!attribute)
     return res
       .status(404)
-      .send({ message: "The equipment part with the given ID was not found." });
+      .send({ message: "The attribute with the given ID was not found." });
 
-  const deletedPart = await prisma.part.delete({ where: { id } });
+  await prisma.attribute.delete({ where: { id } });
 
-  res.send(deletedPart);
+  res.send(attribute);
 });
 
 export default router;

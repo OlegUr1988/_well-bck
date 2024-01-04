@@ -4,7 +4,7 @@ import { prisma } from "../prisma/client";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const types = await prisma.parameterType.findMany({
+  const types = await prisma.attributeType.findMany({
     orderBy: { name: "asc" },
   });
 
