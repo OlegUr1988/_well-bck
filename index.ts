@@ -1,14 +1,14 @@
 import express from "express";
+import path from "path";
+import cors from "./middlewares/cors";
+import PHDTags from "./routes/PHDTags";
 import areas from "./routes/areas";
 import assets from "./routes/assets";
-import PHDTags from "./routes/PHDTags";
-import equipments from "./routes/equipments";
-import units from "./routes/units";
+import assignments from "./routes/assignments";
 import attributeTypes from "./routes/attributeTypes";
 import attributes from "./routes/attributes";
-import assignments from "./routes/assignments";
-import cors from "./middlewares/cors";
-import path from "path";
+import equipments from "./routes/equipments";
+import units from "./routes/units";
 
 const app = express();
 

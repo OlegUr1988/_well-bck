@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "SET PORT=3000 & ts-node index.ts"
+    "start": "SET PORT=3000 & ts-node init.ts & ts-node index.ts",
+    "dev": "nodemon index.ts"
   },
   "keywords": [],
   "author": "",
