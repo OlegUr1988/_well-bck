@@ -123,11 +123,19 @@ router.delete("/:id", async (req, res) => {
 
   const asset = await prisma.asset.findUnique({
     where: { id },
+    include: {
+      equipment: true,
+    },
   });
   if (!asset)
     return res
       .status(404)
       .send({ message: "The asset with the given ID was not found." });
+
+  if (asset.equipment.length)
+    return res
+      .status(500)
+      .send({ message: "The asset has one or more equipments" });
 
   await prisma.asset.delete({ where: { id } });
 

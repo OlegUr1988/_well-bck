@@ -83,11 +83,17 @@ router.delete("/:id", async (req, res) => {
 
   const area = await prisma.area.findUnique({
     where: { id },
+    include: {
+      asset: true,
+    },
   });
   if (!area)
     return res
       .status(404)
       .send({ message: "The area with the given ID was not found." });
+
+  if (area.asset.length)
+    return res.status(500).send({ message: "The area has one or more assets" });
 
   await prisma.area.delete({ where: { id } });
 

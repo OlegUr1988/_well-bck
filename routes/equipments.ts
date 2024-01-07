@@ -63,7 +63,7 @@ router.post("/", async (req, res) => {
   const newEquipment = await prisma.equipment.create({
     data: {
       name,
-       assetId,
+      assetId,
     },
   });
 
@@ -107,11 +107,20 @@ router.delete("/:id", async (req, res) => {
 
   const equipment = await prisma.equipment.findUnique({
     where: { id },
+    include: {
+      attribute: true,
+    },
   });
   if (!equipment)
     return res
       .status(404)
       .send({ message: "The equipment with the given ID was not found." });
+
+  await prisma.attribute.deleteMany({
+    where: {
+      equipmentId: id,
+    },
+  });
 
   await prisma.equipment.delete({ where: { id } });
 

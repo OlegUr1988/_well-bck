@@ -74,7 +74,7 @@ model Assignment {
   attributeId Int
   PHDTagId    Int
 
-  attribute Attribute @relation(fields: [attributeId], references: [id])
+  attribute Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
   PHDTag    PHDTag    @relation(fields: [PHDTagId], references: [id])
 
   @@id([attributeId, PHDTagId])
