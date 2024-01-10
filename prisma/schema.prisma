@@ -84,7 +84,7 @@ model Record {
   id        Int      @id @default(autoincrement())
   value     Decimal
   PHDTagId  Int
-  timestamp DateTime
+  timestamp DateTime @default(dbgenerated("getdate()"))
 
   PHDTag PHDTag @relation(fields: [PHDTagId], references: [id])
 }
