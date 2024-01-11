@@ -28,7 +28,10 @@ router.get(
         }
       : {};
 
-    const params = await prisma.attribute.findMany({ where });
+    const params = await prisma.attribute.findMany({
+      where,
+      include: { attributeType: true },
+    });
 
     res.send(params);
   }
