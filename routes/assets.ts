@@ -12,6 +12,7 @@ const router = express.Router();
 
 interface AssetQuery {
   areaId: string;
+  name: string;
 }
 
 router.get(
@@ -20,7 +21,16 @@ router.get(
     req: Request<RequestParams, ResponseBody, RequestBody, AssetQuery>,
     res: Response
   ) => {
-    const { areaId } = req.query;
+    const { areaId, name } = req.query;
+
+    if (name) {
+      const asset = await prisma.asset.findUnique({ where: { name } });
+      if (!asset)
+        return res
+          .status(404)
+          .send({ message: "The asset with given name was not found." });
+      return res.send(asset);
+    }
 
     const where = areaId
       ? {
