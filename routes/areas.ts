@@ -1,15 +1,44 @@
-import express from "express";
+import express, { Request, Response } from "express";
+import Area from "../entities/Area";
+import {
+  RequestBody,
+  RequestParams,
+  ResponseBody,
+} from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
 import { areaSchema } from "../schemas";
-import Area from "../entities/Area";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const areas = await prisma.area.findMany();
+interface AreaQuery {
+  name: string;
+}
 
-  res.send(areas);
-});
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, AreaQuery>,
+    res: Response
+  ) => {
+    const { name } = req.query;
+
+    if (name) {
+      const area = await prisma.area.findUnique({
+        where: { name },
+        include: { asset: true },
+      });
+      if (!area)
+        return res
+          .status(404)
+          .send({ message: "The area with given name was not found." });
+      return res.send(area);
+    }
+
+    const areas = await prisma.area.findMany();
+
+    res.send(areas);
+  }
+);
 
 router.get("/:id", async (req, res) => {
   const area = await prisma.area.findUnique({
