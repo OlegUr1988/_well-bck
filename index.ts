@@ -9,6 +9,7 @@ import assignments from "./routes/assignments";
 import attributeTypes from "./routes/attributeTypes";
 import attributes from "./routes/attributes";
 import equipments from "./routes/equipments";
+import records from "./routes/records";
 import units from "./routes/units";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/attribute-types", attributeTypes);
 app.use("/api/attributes", attributes);
 app.use("/api/phd-tags", PHDTags);
 app.use("/api/assignments", assignments);
+app.use("/api/records", records);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
