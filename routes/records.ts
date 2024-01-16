@@ -1,4 +1,6 @@
+import { Record } from "@prisma/client";
 import express, { Request, Response } from "express";
+import _ from "lodash";
 import {
   RequestBody,
   RequestParams,
@@ -20,15 +22,19 @@ router.get(
   ) => {
     const { PHDTagIds } = req.query;
 
-    const where = PHDTagIds
-      ? { PHDTagId: { in: PHDTagIds.map((id) => parseInt(id)) } }
-      : {};
+    let records: Record[] = [];
 
-    const records = await prisma.record.findMany({
-      orderBy: { timestamp: "asc" },
-      where,
-      include: { PHDTag: { include: { unit: true } } },
-    });
+    for (let id of PHDTagIds) {
+      const record = await prisma.record.findMany({
+        where: {
+          PHDTagId: parseInt(id),
+        },
+        include: { PHDTag: { include: { unit: true } } },
+      });
+      records = _.concat(records, record);
+    }
+
+    console.log(PHDTagIds);
 
     res.send(records);
   }
