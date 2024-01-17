@@ -5,7 +5,7 @@ const units = [
     name: "%",
   },
   { name: "kWh" },
-  { name: "ton of CO2" },
+  { name: "ton CO2" },
 ];
 
 const attributeTypes = [{ name: "Duty" }, { name: "Loss" }];
