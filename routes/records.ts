@@ -34,8 +34,6 @@ router.get(
       records = _.concat(records, record);
     }
 
-    console.log(PHDTagIds);
-
     res.send(records);
   }
 );
