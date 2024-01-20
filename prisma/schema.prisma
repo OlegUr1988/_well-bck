@@ -86,5 +86,5 @@ model Record {
   PHDTagId  Int
   timestamp DateTime @default(dbgenerated("getdate()"))
 
-  PHDTag PHDTag @relation(fields: [PHDTagId], references: [id])
+  PHDTag PHDTag @relation(fields: [PHDTagId], references: [id], onDelete: Cascade)
 }
