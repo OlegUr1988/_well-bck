@@ -73,7 +73,7 @@ CREATE TABLE [dbo].[Record] (
     [id] INT NOT NULL IDENTITY(1,1),
     [value] DECIMAL(32,16) NOT NULL,
     [PHDTagId] INT NOT NULL,
-    [timestamp] DATETIME2 NOT NULL,
+    [timestamp] DATE NOT NULL CONSTRAINT [Record_timestamp_df] DEFAULT getdate(),
     CONSTRAINT [Record_pkey] PRIMARY KEY CLUSTERED ([id])
 );
 
@@ -93,13 +93,13 @@ ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [Attribute_attributeTypeId_fkey] FO
 ALTER TABLE [dbo].[PHDTag] ADD CONSTRAINT [PHDTag_unitId_fkey] FOREIGN KEY ([unitId]) REFERENCES [dbo].[Unit]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Assignment] ADD CONSTRAINT [Assignment_attributeId_fkey] FOREIGN KEY ([attributeId]) REFERENCES [dbo].[Attribute]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Assignment] ADD CONSTRAINT [Assignment_attributeId_fkey] FOREIGN KEY ([attributeId]) REFERENCES [dbo].[Attribute]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[Assignment] ADD CONSTRAINT [Assignment_PHDTagId_fkey] FOREIGN KEY ([PHDTagId]) REFERENCES [dbo].[PHDTag]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Record] ADD CONSTRAINT [Record_PHDTagId_fkey] FOREIGN KEY ([PHDTagId]) REFERENCES [dbo].[PHDTag]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Record] ADD CONSTRAINT [Record_PHDTagId_fkey] FOREIGN KEY ([PHDTagId]) REFERENCES [dbo].[PHDTag]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 COMMIT TRAN;
 

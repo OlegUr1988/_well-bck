@@ -81,10 +81,10 @@ model Assignment {
 }
 
 model Record {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   value     Decimal
   PHDTagId  Int
-  timestamp DateTime @default(dbgenerated("getdate()"))
+  timestamp String  @db.VarChar(300)
 
   PHDTag PHDTag @relation(fields: [PHDTagId], references: [id], onDelete: Cascade)
 }
