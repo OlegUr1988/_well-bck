@@ -30,7 +30,11 @@ router.get(
 
     const equipments = await prisma.equipment.findMany({
       where,
-      include: { attribute: { include: { assignment: true } } },
+      include: {
+        attribute: {
+          include: { assignment: { include: { attribute: true } } },
+        },
+      },
     });
 
     res.send(equipments);

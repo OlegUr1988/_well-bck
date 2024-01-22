@@ -38,7 +38,7 @@ export interface HttpError
   extends AxiosError<AxiosValidationError, Record<string, unknown>> {}
 
 const axiosInstance = axios.create({
-  baseURL: "https://192.168.68.111:3152",
+  baseURL: "https://10.0.1.84:3152",
   httpsAgent: agent,
   insecureHTTPParser: true,
 });
