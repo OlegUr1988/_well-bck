@@ -4,7 +4,7 @@ BEGIN TRAN;
 
 -- AlterTable
 ALTER TABLE [dbo].[Record] DROP CONSTRAINT [Record_timestamp_df];
-ALTER TABLE [dbo].[Record] ADD CONSTRAINT [Record_timestamp_df] DEFAULT getdate() FOR [timestamp];
+ALTER TABLE [dbo].[Record] ALTER COLUMN [timestamp] VARCHAR(300) NOT NULL;
 
 COMMIT TRAN;
 

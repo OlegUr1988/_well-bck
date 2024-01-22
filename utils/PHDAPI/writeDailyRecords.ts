@@ -1,9 +1,13 @@
+import moment from "moment";
 import { JobLogger } from "../../misc/logger";
 import { prisma } from "../../prisma/client";
 import getSumOfDailyRecord from "./getSumOfDailyRecord";
 
 const writeDailyRecords = async () => {
   JobLogger.info("Starting job...");
+
+  const timestamp = moment().format("YYYY-MM-DDTHH:mm:ss");
+
   try {
     const tags = await prisma.pHDTag.findMany();
     for (let tag of tags) {
@@ -13,6 +17,7 @@ const writeDailyRecords = async () => {
         data: {
           PHDTagId: tag.id,
           value: sum,
+          timestamp,
         },
       });
     }
