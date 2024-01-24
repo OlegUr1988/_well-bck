@@ -2,6 +2,7 @@ import moment from "moment";
 import { JobLogger } from "../../misc/logger";
 import { prisma } from "../../prisma/client";
 import getSumOfDailyRecord from "./getSumOfDailyRecord";
+import getAverageOfDailyRecord from "./getAverageOfDailyRecord";
 
 const writeDailyRecords = async () => {
   JobLogger.info("Starting job...");
@@ -9,9 +10,12 @@ const writeDailyRecords = async () => {
   const timestamp = moment().format("YYYY-MM-DDTHH:mm:ss");
 
   try {
-    const tags = await prisma.pHDTag.findMany();
+    const tags = await prisma.pHDTag.findMany({ include: { unit: true } });
     for (let tag of tags) {
-      const sum = await getSumOfDailyRecord(tag.tagname);
+      const sum =
+        tag.unit.name === "%"
+          ? await getAverageOfDailyRecord(tag.tagname)
+          : await getSumOfDailyRecord(tag.tagname);
 
       await prisma.record.create({
         data: {
