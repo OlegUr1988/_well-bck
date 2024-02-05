@@ -22,6 +22,11 @@ router.get(
   ) => {
     const { PHDTagIds } = req.query;
 
+    if (!PHDTagIds) {
+      const records = await prisma.record.findMany();
+      return res.send(records);
+    }
+
     let records: Record[] = [];
 
     for (let id of PHDTagIds) {
