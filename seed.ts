@@ -1,5 +1,10 @@
 import { prisma } from "./prisma/client";
 
+const dataSource = {
+  host: "localhost",
+  port: 3152,
+};
+
 const units = [
   {
     name: "%",
@@ -12,6 +17,7 @@ const attributeTypes = [{ name: "Duty" }, { name: "Loss" }];
 
 const fillTables = async () => {
   try {
+    await prisma.dataSource.create({ data: dataSource });
     await prisma.unit.createMany({ data: units });
     await prisma.attributeType.createMany({ data: attributeTypes });
   } catch (error) {

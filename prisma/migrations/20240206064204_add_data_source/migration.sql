@@ -1,0 +1,24 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[DataSource] (
+    [id] INT NOT NULL IDENTITY(1,1),
+    [host] VARCHAR(300) NOT NULL,
+    [port] INT NOT NULL,
+    CONSTRAINT [DataSource_pkey] PRIMARY KEY CLUSTERED ([id])
+);
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

@@ -8,6 +8,7 @@ import assets from "./routes/assets";
 import assignments from "./routes/assignments";
 import attributeTypes from "./routes/attributeTypes";
 import attributes from "./routes/attributes";
+import dataSources from "./routes/dataSources";
 import equipments from "./routes/equipments";
 import records from "./routes/records";
 import units from "./routes/units";
@@ -26,6 +27,7 @@ app.use("/api/attributes", attributes);
 app.use("/api/phd-tags", PHDTags);
 app.use("/api/assignments", assignments);
 app.use("/api/records", records);
+app.use("/api/data-sources", dataSources);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
