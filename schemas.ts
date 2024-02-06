@@ -37,3 +37,8 @@ export const assignmentSchema = z.object({
 export const updateAssignmentSchema = z.object({
   PHDTagId: z.number().min(1),
 });
+
+export const dataSourceSchema = z.object({
+  host: z.string().min(1).max(300),
+  port: z.number().min(1),
+});

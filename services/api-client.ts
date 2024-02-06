@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import * as https from "https";
+import { prisma } from "../prisma/client";
 
 const agent = new https.Agent({
   rejectUnauthorized: false,
@@ -37,19 +38,45 @@ interface AxiosValidationError {
 export interface HttpError
   extends AxiosError<AxiosValidationError, Record<string, unknown>> {}
 
-const axiosInstance = axios.create({
-  baseURL: "https://10.0.2.69:3152",
-  httpsAgent: agent,
-  insecureHTTPParser: true,
-});
+// Factory function to create axios instance with dynamic baseURL
+const createAxiosInstance = async () => {
+  const baseURL = await getBaseUrl();
 
-export const getTags = axiosInstance
-  .get<TagListResponse>("/TagList")
-  .then((res) => res.data)
-  .catch((err) => err);
+  const axiosInstance = axios.create({
+    baseURL,
+    httpsAgent: agent,
+    insecureHTTPParser: true,
+  });
 
-export const getData = (params: AxiosRequestConfig) =>
-  axiosInstance
+  return axiosInstance;
+};
+
+const getBaseUrl = async () => {
+  const dataSource = await prisma.dataSource.findUnique({
+    where: { id: 1 },
+  });
+
+  if (!dataSource) {
+    throw new Error("Could not get datasource");
+  }
+
+  return `https://${dataSource.host}:${dataSource.port}`;
+};
+
+export const getTags = async () => {
+  const axiosInstance = await createAxiosInstance();
+
+  return axiosInstance
+    .get<TagListResponse>("/TagList")
+    .then((res) => res.data)
+    .catch((err) => err);
+};
+
+export const getData = async (params: AxiosRequestConfig) => {
+  const axiosInstance = await createAxiosInstance();
+
+  return axiosInstance
     .get<GetDataResponse[]>("/GetData", params)
     .then((res) => res.data)
     .catch((err) => err);
+};

@@ -88,3 +88,9 @@ model Record {
 
   PHDTag PHDTag @relation(fields: [PHDTagId], references: [id], onDelete: Cascade)
 }
+
+model DataSource {
+  id   Int    @id @default(autoincrement())
+  host String @db.VarChar(300)
+  port Int
+}
