@@ -67,14 +67,36 @@ router.post("/", async (req, res) => {
   if (!asset)
     return res.status(400).send({ message: "Invalid asset was provided" });
 
-  const newEquipment = await prisma.equipment.create({
-    data: {
-      name,
-      assetId,
-    },
-  });
+  await prisma.$transaction(async (tx) => {
+    const newEquipment = await tx.equipment.create({
+      data: {
+        name,
+        assetId,
+      },
+    });
 
-  res.status(201).send(newEquipment);
+    const dutyType = await tx.attributeType.findUnique({
+      where: { name: "duty" },
+    });
+
+    if (dutyType) {
+      const data = [
+        {
+          attributeTypeId: dutyType.id,
+          equipmentId: newEquipment.id,
+          name: "Duty",
+        },
+        {
+          attributeTypeId: dutyType.id,
+          equipmentId: newEquipment.id,
+          name: "Useful work",
+        },
+      ];
+
+      await tx.attribute.createMany({ data });
+    }
+    res.status(201).send(newEquipment);
+  });
 });
 
 router.put("/:id", async (req, res) => {
