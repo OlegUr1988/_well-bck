@@ -13,7 +13,11 @@ const units = [
   { name: "ton CO2" },
 ];
 
-const attributeTypes = [{ name: "Duty" }, { name: "Loss" }];
+const attributeTypes = [
+  { name: "Duty" },
+  { name: "Design Loss" },
+  { name: "Operating Loss" },
+];
 
 const fillTables = async () => {
   try {
