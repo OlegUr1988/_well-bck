@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const types = await prisma.attributeType.findMany({
-    orderBy: { name: "asc" },
+    orderBy: { id: "asc" },
   });
 
   res.send(types);
