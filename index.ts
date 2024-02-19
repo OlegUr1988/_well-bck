@@ -13,13 +13,13 @@ import equipments from "./routes/equipments";
 import records from "./routes/records";
 import units from "./routes/units";
 import users from "./routes/users";
+import auth from "./routes/auth";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors);
 app.use(express.static("dist"));
-app.use("/api/users", users);
 app.use("/api/areas", areas);
 app.use("/api/assets", assets);
 app.use("/api/equipments", equipments);
@@ -30,6 +30,8 @@ app.use("/api/phd-tags", PHDTags);
 app.use("/api/assignments", assignments);
 app.use("/api/records", records);
 app.use("/api/data-sources", dataSources);
+app.use("/api/users", users);
+app.use("/api/auth", auth);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
