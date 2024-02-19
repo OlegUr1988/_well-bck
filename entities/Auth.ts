@@ -1,6 +1,5 @@
-import { JwtPayload } from "jsonwebtoken";
-import { Request } from "express";
 import { User } from "@prisma/client";
+import { Request } from "express";
 
 export default interface AuthRequest extends Request {
   user: User;

@@ -12,9 +12,8 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
       .send({ message: "Access denied. No token provided." });
 
   try {
-    const decoded = jwt.verify(token!, getKey());
-    (req as AuthRequest).user = decoded as User;
-    console.log(decoded);
+    const decoded = jwt.verify(token!, getKey()) as User;
+    (req as AuthRequest).user = decoded;
     next();
   } catch (error) {
     res.status(400).send({ message: "Invalid token." });

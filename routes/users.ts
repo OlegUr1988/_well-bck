@@ -12,7 +12,6 @@ const router = express.Router();
 
 router.get("/me", auth, async (req, res) => {
   const { user } = req as AuthRequest;
-  console.log(user);
   const me = await prisma.user.findUnique({
     where: { id: user.id },
   });
