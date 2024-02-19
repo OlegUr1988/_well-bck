@@ -1,12 +1,13 @@
 import express, { Request, Response } from "express";
+import Equipment from "../entities/Equipment";
 import {
   RequestBody,
   RequestParams,
   ResponseBody,
 } from "../entities/RequestQuery";
+import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { equipmentSchema } from "../schemas";
-import Equipment from "../entities/Equipment";
 
 const router = express.Router();
 
@@ -54,7 +55,7 @@ router.get("/:id", async (req, res) => {
   res.send(equipment);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const validation = equipmentSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
@@ -99,7 +100,7 @@ router.post("/", async (req, res) => {
   });
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const equipment = await prisma.equipment.findUnique({
@@ -131,7 +132,7 @@ router.put("/:id", async (req, res) => {
   res.send(updatedEquipment);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const equipment = await prisma.equipment.findUnique({

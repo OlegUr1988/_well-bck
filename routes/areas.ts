@@ -5,6 +5,7 @@ import {
   RequestParams,
   ResponseBody,
 } from "../entities/RequestQuery";
+import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { areaSchema } from "../schemas";
 
@@ -52,7 +53,7 @@ router.get("/:id", async (req, res) => {
   res.send(area);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const validation = areaSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
@@ -73,7 +74,7 @@ router.post("/", async (req, res) => {
   res.status(201).send(newArea);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const area = await prisma.area.findUnique({
@@ -107,7 +108,7 @@ router.put("/:id", async (req, res) => {
   res.status(200).send(updatedArea);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const area = await prisma.area.findUnique({

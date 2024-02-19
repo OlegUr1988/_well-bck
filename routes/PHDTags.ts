@@ -6,6 +6,7 @@ import {
   RequestQuery,
   ResponseBody,
 } from "../entities/RequestQuery";
+import auth from "../middlewares/auth";
 import { exportToExcel, importFromExcel } from "../misc/excel/PHDTags";
 import { prisma } from "../prisma/client";
 import { phdTagSchema } from "../schemas";
@@ -75,7 +76,7 @@ router.get("/:id", async (req, res) => {
   res.send(tag);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const validation = phdTagSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
@@ -101,11 +102,16 @@ router.post("/", async (req, res) => {
   res.status(201).send(newTag);
 });
 
-router.post("/importFromExcel", upload.single("excelFile"), (req, res) => {
-  importFromExcel(req, res);
-});
+router.post(
+  "/importFromExcel",
+  auth,
+  upload.single("excelFile"),
+  (req, res) => {
+    importFromExcel(req, res);
+  }
+);
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const tag = await prisma.pHDTag.findUnique({
@@ -142,7 +148,7 @@ router.put("/:id", async (req, res) => {
   res.status(200).send(updatedTag);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const tag = await prisma.pHDTag.findUnique({
