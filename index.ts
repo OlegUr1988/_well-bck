@@ -12,12 +12,14 @@ import dataSources from "./routes/dataSources";
 import equipments from "./routes/equipments";
 import records from "./routes/records";
 import units from "./routes/units";
+import users from "./routes/users";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors);
 app.use(express.static("dist"));
+app.use("/api/users", users);
 app.use("/api/areas", areas);
 app.use("/api/assets", assets);
 app.use("/api/equipments", equipments);
