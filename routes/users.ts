@@ -1,11 +1,10 @@
-import express from "express";
-import { userSchema } from "../schemas";
 import { User } from "@prisma/client";
-import { prisma } from "../prisma/client";
-import _ from "lodash";
 import bcrypt from "bcrypt";
-import getKey from "../utils/getKey";
-import jwt from "jsonwebtoken";
+import express from "express";
+import _ from "lodash";
+import { prisma } from "../prisma/client";
+import { userSchema } from "../schemas";
+import { generateAuthToken } from "../utils/auth";
 
 const router = express.Router();
 
@@ -31,7 +30,7 @@ router.post("/", async (req, res) => {
     },
   });
 
-  const token = jwt.sign({ id: newUser.id }, getKey());
+  const token = generateAuthToken(newUser);
 
   res
     .status(201)

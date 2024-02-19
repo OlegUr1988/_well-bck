@@ -1,10 +1,9 @@
 import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import express from "express";
-import jwt from "jsonwebtoken";
 import { prisma } from "../prisma/client";
 import { userSchema } from "../schemas";
-import getKey from "../utils/getKey";
+import { generateAuthToken } from "../utils/auth";
 
 const router = express.Router();
 
@@ -23,7 +22,7 @@ router.post("/", async (req, res) => {
   if (!validPassword)
     return res.status(400).send({ message: "Invalid email or password." });
 
-  const token = jwt.sign({ id: user.id }, getKey());
+  const token = generateAuthToken(user);
 
   res.send(token);
 });
