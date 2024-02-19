@@ -5,8 +5,20 @@ import _ from "lodash";
 import { prisma } from "../prisma/client";
 import { userSchema } from "../schemas";
 import { generateAuthToken } from "../utils/auth";
+import auth from "../middlewares/auth";
+import AuthRequest from "../entities/Auth";
 
 const router = express.Router();
+
+router.get("/me", auth, async (req, res) => {
+  const { user } = req as AuthRequest;
+  console.log(user);
+  const me = await prisma.user.findUnique({
+    where: { id: user.id },
+  });
+
+  res.send(_.pick(me, ["id", "username", "isAdmin", "joined_at"]));
+});
 
 router.post("/", async (req, res) => {
   const validation = userSchema.safeParse(req.body);
