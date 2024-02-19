@@ -25,7 +25,9 @@ router.post("/", async (req, res) => {
     },
   });
 
-  res.status(201).send(_.pick(newUser, ["id", "username", "isAdmin"]));
+  res
+    .status(201)
+    .send(_.pick(newUser, ["id", "username", "isAdmin", "joined_at"]));
 });
 
 export default router;

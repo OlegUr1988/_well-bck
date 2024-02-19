@@ -73,8 +73,27 @@ CREATE TABLE [dbo].[Record] (
     [id] INT NOT NULL IDENTITY(1,1),
     [value] DECIMAL(32,16) NOT NULL,
     [PHDTagId] INT NOT NULL,
-    [timestamp] DATE NOT NULL CONSTRAINT [Record_timestamp_df] DEFAULT getdate(),
+    [timestamp] VARCHAR(300) NOT NULL,
     CONSTRAINT [Record_pkey] PRIMARY KEY CLUSTERED ([id])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[DataSource] (
+    [id] INT NOT NULL IDENTITY(1,1),
+    [host] VARCHAR(300) NOT NULL,
+    [port] INT NOT NULL,
+    CONSTRAINT [DataSource_pkey] PRIMARY KEY CLUSTERED ([id])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[User] (
+    [id] INT NOT NULL IDENTITY(1,1),
+    [username] VARCHAR(50) NOT NULL,
+    [password] VARCHAR(1024) NOT NULL,
+    [isAdmin] BIT NOT NULL CONSTRAINT [User_isAdmin_df] DEFAULT 0,
+    [joined_at] DATETIME NOT NULL CONSTRAINT [User_joined_at_df] DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT [User_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [User_username_key] UNIQUE NONCLUSTERED ([username])
 );
 
 -- AddForeignKey
