@@ -1,8 +1,8 @@
+import { User } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import AuthRequest from "../entities/Auth";
 import getKey from "../utils/getKey";
-import { User } from "@prisma/client";
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header("x-auth-token");

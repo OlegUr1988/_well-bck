@@ -2,11 +2,11 @@ import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import express from "express";
 import _ from "lodash";
+import AuthRequest from "../entities/Auth";
+import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { userSchema } from "../schemas";
 import { generateAuthToken } from "../utils/auth";
-import auth from "../middlewares/auth";
-import AuthRequest from "../entities/Auth";
 
 const router = express.Router();
 
