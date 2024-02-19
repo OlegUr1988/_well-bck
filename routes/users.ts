@@ -3,6 +3,7 @@ import { userSchema } from "../schemas";
 import { User } from "@prisma/client";
 import { prisma } from "../prisma/client";
 import _ from "lodash";
+import bcrypt from "bcrypt";
 
 const router = express.Router();
 
@@ -17,10 +18,13 @@ router.post("/", async (req, res) => {
   if (user)
     return res.status(400).send({ message: "User already registered." });
 
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(password, salt);
+
   const newUser = await prisma.user.create({
     data: {
       username,
-      password,
+      password: hashed,
       isAdmin,
     },
   });
