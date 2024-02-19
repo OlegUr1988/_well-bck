@@ -8,14 +8,20 @@ import assets from "./routes/assets";
 import assignments from "./routes/assignments";
 import attributeTypes from "./routes/attributeTypes";
 import attributes from "./routes/attributes";
+import auth from "./routes/auth";
 import dataSources from "./routes/dataSources";
 import equipments from "./routes/equipments";
 import records from "./routes/records";
 import units from "./routes/units";
 import users from "./routes/users";
-import auth from "./routes/auth";
+import getKey from "./utils/getKey";
 
 const app = express();
+
+if (!getKey()) {
+  console.error("FATAL ERROR: secret key is not defined.");
+  process.exit(1);
+}
 
 app.use(express.json());
 app.use(cors);

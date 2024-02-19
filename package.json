@@ -7,7 +7,8 @@
     "start": "SET PORT=3000 & ts-node init.ts & ts-node index.ts",
     "dev": "nodemon index.ts",
     "test-source": "ts-node utils/PHDAPI/testPHDAPI.ts",
-    "write-data": "ts-node utils/PHDAPI/writeData.ts"
+    "write-data": "ts-node utils/PHDAPI/writeData.ts",
+    "create-secret": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\" > secret_key.txt"
   },
   "keywords": [],
   "author": "",
