@@ -4,6 +4,8 @@ import { User } from "@prisma/client";
 import { prisma } from "../prisma/client";
 import _ from "lodash";
 import bcrypt from "bcrypt";
+import getKey from "../utils/getKey";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -29,8 +31,11 @@ router.post("/", async (req, res) => {
     },
   });
 
+  const token = jwt.sign({ id: newUser.id }, getKey());
+
   res
     .status(201)
+    .header("x-auth-token", token)
     .send(_.pick(newUser, ["id", "username", "isAdmin", "joined_at"]));
 });
 
