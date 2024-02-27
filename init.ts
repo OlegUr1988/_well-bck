@@ -8,5 +8,3 @@ if (!fs.existsSync(".initialized")) {
 } else {
   console.log("Project already initialized");
 }
-
-console.log("Initialization");

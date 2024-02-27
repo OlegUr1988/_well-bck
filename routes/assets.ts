@@ -5,6 +5,7 @@ import {
   RequestParams,
   ResponseBody,
 } from "../entities/RequestQuery";
+import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
 
@@ -57,7 +58,7 @@ router.get("/:id", async (req, res) => {
   res.send(asset);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const validation = assetSchema.safeParse(req.body);
   if (!validation.success)
     return res.status(400).send(validation.error.format());
@@ -86,7 +87,7 @@ router.post("/", async (req, res) => {
   res.status(201).send(newAsset);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const asset = await prisma.asset.findUnique({
@@ -128,7 +129,7 @@ router.put("/:id", async (req, res) => {
   res.send(updatedAsset);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const asset = await prisma.asset.findUnique({

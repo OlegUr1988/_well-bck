@@ -8,12 +8,20 @@ import assets from "./routes/assets";
 import assignments from "./routes/assignments";
 import attributeTypes from "./routes/attributeTypes";
 import attributes from "./routes/attributes";
+import auth from "./routes/auth";
 import dataSources from "./routes/dataSources";
 import equipments from "./routes/equipments";
 import records from "./routes/records";
 import units from "./routes/units";
+import users from "./routes/users";
+import getKey from "./utils/getKey";
 
 const app = express();
+
+if (!getKey()) {
+  console.error("FATAL ERROR: secret key is not defined.");
+  process.exit(1);
+}
 
 app.use(express.json());
 app.use(cors);
@@ -28,6 +36,8 @@ app.use("/api/phd-tags", PHDTags);
 app.use("/api/assignments", assignments);
 app.use("/api/records", records);
 app.use("/api/data-sources", dataSources);
+app.use("/api/users", users);
+app.use("/api/auth", auth);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));

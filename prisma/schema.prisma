@@ -94,3 +94,11 @@ model DataSource {
   host String @db.VarChar(300)
   port Int
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(50)
+  password  String   @db.VarChar(1024)
+  isAdmin   Boolean  @default(false) @db.Bit
+  joined_at DateTime @default(now()) @db.DateTime
+}

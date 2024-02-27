@@ -42,3 +42,8 @@ export const dataSourceSchema = z.object({
   host: z.string().min(1).max(300),
   port: z.number().min(1),
 });
+
+export const userSchema = z.object({
+  username: z.string().min(1).max(50),
+  password: z.string().min(1).max(255),
+});
