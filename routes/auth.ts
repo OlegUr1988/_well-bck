@@ -16,15 +16,15 @@ router.post("/", async (req, res) => {
 
   const user = await prisma.user.findUnique({ where: { username } });
   if (!user)
-    return res.status(400).send({ message: "Invalid email or password." });
+    return res.status(400).send({ message: "Invalid username or password." });
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword)
-    return res.status(400).send({ message: "Invalid email or password." });
+    return res.status(400).send({ message: "Invalid username or password." });
 
   const token = generateAuthToken(user);
 
-  res.send(token);
+  res.send({ token });
 });
 
 export default router;
