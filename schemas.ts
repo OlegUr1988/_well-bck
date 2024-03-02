@@ -45,5 +45,9 @@ export const dataSourceSchema = z.object({
 
 export const userSchema = z.object({
   username: z.string().min(1).max(50),
-  password: z.string().min(1).max(255),
+  password: z.string().min(4).max(255),
+});
+
+export const updateUserPasswordSchema = z.object({
+  password: z.string().min(4).max(255),
 });
