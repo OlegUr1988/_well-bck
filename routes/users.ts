@@ -33,6 +33,12 @@ router.get(
 
     const orderBy = { username: "asc" } as const;
 
+    const select = {
+      id: true,
+      username: true,
+      isAdmin: true,
+    };
+
     const count = (await prisma.user.findMany({ where })).length;
 
     const users =
@@ -40,12 +46,14 @@ router.get(
         ? await prisma.user.findMany({
             where,
             orderBy,
+            select,
             skip: (parseInt(page) - 1) * parseInt(pageSize),
             take: parseInt(pageSize),
           })
         : await prisma.user.findMany({
             orderBy,
             where,
+            select,
           });
 
     res.send({
