@@ -1,13 +1,19 @@
 import { User } from "@prisma/client";
-import express from "express";
+import express, { Request, Response } from "express";
 import _ from "lodash";
 import AuthRequest from "../entities/Auth";
+import admin from "../middlewares/admin";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { updateUserPasswordSchema, userSchema } from "../schemas";
 import { generateAuthToken, getHashedPassword } from "../utils/auth";
 
 const router = express.Router();
+
+router.get("/", [auth, admin], async (req: Request, res: Response) => {
+  const users = await prisma.user.findMany();
+  res.send(users);
+});
 
 router.get("/me", auth, async (req, res) => {
   const { user } = req as AuthRequest;
