@@ -2,6 +2,12 @@ import { User } from "@prisma/client";
 import express, { Request, Response } from "express";
 import _ from "lodash";
 import AuthRequest from "../entities/Auth";
+import {
+  RequestBody,
+  RequestParams,
+  RequestQuery,
+  ResponseBody,
+} from "../entities/RequestQuery";
 import admin from "../middlewares/admin";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
@@ -10,10 +16,46 @@ import { generateAuthToken, getHashedPassword } from "../utils/auth";
 
 const router = express.Router();
 
-router.get("/", [auth, admin], async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany();
-  res.send(users);
-});
+router.get(
+  "/",
+  [auth, admin],
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
+    res: Response
+  ) => {
+    const { page, pageSize, searchedName } = req.query;
+
+    const where = {
+      username: {
+        contains: searchedName,
+      },
+    };
+
+    const orderBy = { username: "asc" } as const;
+
+    const count = (await prisma.user.findMany({ where })).length;
+
+    const users =
+      page && pageSize
+        ? await prisma.user.findMany({
+            where,
+            orderBy,
+            skip: (parseInt(page) - 1) * parseInt(pageSize),
+            take: parseInt(pageSize),
+          })
+        : await prisma.user.findMany({
+            orderBy,
+            where,
+          });
+
+    res.send({
+      count,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      results: users,
+    });
+  }
+);
 
 router.get("/me", auth, async (req, res) => {
   const { user } = req as AuthRequest;
