@@ -11,11 +11,16 @@ import {
 import admin from "../middlewares/admin";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
-import { updateUserPasswordSchema, userSchema } from "../schemas";
+import {
+  updateUserPasswordSchema,
+  updateUserSchema,
+  userSchema,
+} from "../schemas";
 import { generateAuthToken, getHashedPassword } from "../utils/auth";
 
 const router = express.Router();
 
+// Get list of users
 router.get(
   "/",
   [auth, admin],
@@ -65,6 +70,7 @@ router.get(
   }
 );
 
+// Get users info
 router.get("/me", auth, async (req, res) => {
   const { user } = req as AuthRequest;
   const me = await prisma.user.findUnique({
@@ -74,6 +80,7 @@ router.get("/me", auth, async (req, res) => {
   res.send(_.pick(me, ["id", "username", "isAdmin", "joined_at"]));
 });
 
+// Register User
 router.post("/", async (req, res) => {
   const validation = userSchema.safeParse(req.body);
   if (!validation.success)
@@ -117,7 +124,7 @@ router.put("/", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { password } = req.body;
+  const { password } = req.body as User;
   const hashed = await getHashedPassword(password);
 
   const updatedUser = await prisma.user.update({
@@ -128,6 +135,92 @@ router.put("/", auth, async (req, res) => {
   });
 
   res.send(_.pick(updatedUser, ["id", "username", "isAdmin", "joined_at"]));
+});
+
+// Update User
+router.put("/:id", [auth, admin], async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!user)
+    return res
+      .status(404)
+      .send({ message: "The user with the given ID was not found." });
+
+  const validation = updateUserSchema.safeParse(req.body);
+  if (!validation.success)
+    return res.status(400).send(validation.error.format());
+
+  const { username, isAdmin } = req.body as User;
+
+  const sameUser = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (sameUser && sameUser.id !== id)
+    return res
+      .status(400)
+      .send({ message: "The user with this tagname is already exists." });
+
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: {
+      username,
+      isAdmin,
+    },
+  });
+
+  res.send(updatedUser);
+});
+
+// Change users password (only for admin users)
+router.put(
+  "/set-password/:id",
+  [auth, admin],
+  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user)
+      return res
+        .status(404)
+        .send({ message: "The user with the given ID was not found." });
+
+    const validation = updateUserPasswordSchema.safeParse(req.body);
+    if (!validation.success)
+      return res.status(400).send(validation.error.format());
+
+    const { password } = req.body;
+    const hashed = await getHashedPassword(password);
+
+    await prisma.user.update({
+      where: { id },
+      data: { password: hashed },
+    });
+
+    res.send({ message: "Password was updated" });
+  }
+);
+
+// Delete users
+router.delete("/:id", [auth, admin], async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!user)
+    return res
+      .status(404)
+      .send({ message: "The user with the given ID was not found." });
+
+  await prisma.user.delete({ where: { id } });
+
+  res.send(user);
 });
 
 export default router;
