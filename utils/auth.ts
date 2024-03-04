@@ -7,6 +7,7 @@ export const generateAuthToken = (user: User) =>
   jwt.sign(
     {
       id: user.id,
+      isAdmin: user.isAdmin,
     },
     getKey(),
     { expiresIn: "1h" }

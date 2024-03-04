@@ -48,6 +48,11 @@ export const userSchema = z.object({
   password: z.string().min(4).max(255),
 });
 
+export const updateUserSchema = z.object({
+  username: z.string().min(1).max(50),
+  isAdmin: z.boolean(),
+});
+
 export const updateUserPasswordSchema = z.object({
   password: z.string().min(4).max(255),
 });

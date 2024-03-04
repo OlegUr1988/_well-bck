@@ -93,7 +93,7 @@ router.put("/:id", auth, async (req, res) => {
   const id = parseInt(req.params.id);
 
   const unit = await prisma.unit.findUnique({
-    where: { id: parseInt(req.params.id) },
+    where: { id },
   });
   if (!unit)
     return res
