@@ -7,10 +7,12 @@ export const generateAuthToken = (user: User) =>
   jwt.sign(
     {
       id: user.id,
+      username: user.username,
       isAdmin: user.isAdmin,
+      joined_at: user.joined_at,
     },
     getKey(),
-    { expiresIn: "1h" }
+    { expiresIn: "2h" }
   );
 
 export const getHashedPassword = async (password: string) => {
