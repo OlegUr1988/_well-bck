@@ -8,7 +8,8 @@
     "dev": "nodemon index.ts",
     "test-source": "ts-node utils/PHDAPI/testPHDAPI.ts",
     "write-data": "ts-node utils/PHDAPI/writeData.ts",
-    "create-secret": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\" > secret_key.txt"
+    "create-secret": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\" > secret_key.txt",
+    "create-superuser": "ts-node createSuperUser.ts"
   },
   "keywords": [],
   "author": "",
