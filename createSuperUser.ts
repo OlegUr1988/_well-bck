@@ -1,4 +1,5 @@
 import { prisma } from "./prisma/client";
+import { getHashedPassword } from "./utils/auth";
 
 // Example of command:
 // npm run create-superuser username:username password:password
@@ -28,10 +29,11 @@ const createSuperUser = async () => {
       if (user) {
         console.log("User is already created");
       } else {
+        const hashed = await getHashedPassword(password);
         await prisma.user.create({
           data: {
-            password,
             username,
+            password: hashed,
             isAdmin: true,
           },
         });
