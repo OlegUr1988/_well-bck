@@ -10,29 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Area {
-  id   Int    @id @default(autoincrement())
-  name String @unique @db.VarChar(255)
-
-  asset Asset[]
-}
-
 model Asset {
-  id     Int    @id @default(autoincrement())
-  name   String @unique @db.VarChar(255)
-  areaId Int
+  id            Int    @id @default(autoincrement())
+  name          String @unique @db.VarChar(255)
+  parentAssetId Int?
 
-  area      Area        @relation(fields: [areaId], references: [id])
-  equipment Equipment[]
-}
-
-model Equipment {
-  id      Int    @id @default(autoincrement())
-  name    String @db.VarChar(255)
-  assetId Int
-
-  asset     Asset       @relation(fields: [assetId], references: [id])
-  attribute Attribute[]
+  attributes  Attribute[]
+  parentAsset Asset?      @relation("Assets", fields: [parentAssetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    Asset[]     @relation("Assets")
 }
 
 model AttributeType {
@@ -45,11 +30,11 @@ model AttributeType {
 model Attribute {
   id              Int    @id @default(autoincrement())
   name            String @db.VarChar(255)
-  equipmentId     Int
+  assetId         Int
   attributeTypeId Int
 
-  equipment     Equipment     @relation(fields: [equipmentId], references: [id])
   attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
+  asset         Asset         @relation(fields: [assetId], references: [id])
   assignment    Assignment[]
 }
 
