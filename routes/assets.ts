@@ -1,35 +1,58 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
 import { Asset } from "@prisma/client";
+import {
+  RequestBody,
+  RequestParams,
+  RequestQuery,
+  ResponseBody,
+} from "../entities/RequestQuery";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const { name } = req.query as unknown as Asset;
+interface AssetQuery extends RequestQuery {
+  name: string;
+}
 
-  if (name) {
-    const asset = await prisma.asset.findUnique({
-      where: { name },
-      include: { children: true },
-    });
-    if (!asset)
-      return res
-        .status(404)
-        .send({ message: "The asset with given name was not found." });
-    return res.send(asset);
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, AssetQuery>,
+    res: Response
+  ) => {
+    const { name } = req.query as AssetQuery;
+
+    if (name) {
+      const asset = await prisma.asset.findUnique({
+        where: { name },
+      });
+      if (!asset)
+        return res
+          .status(404)
+          .send({ message: "The asset with given name was not found." });
+      return res.send(asset);
+    }
+
+    const assets = await prisma.asset.findMany({ include: { children: true } });
+
+    res.send(assets);
   }
-
-  const assets = await prisma.asset.findMany({ include: { children: true } });
-
-  res.send(assets);
-});
+);
 
 router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
     where: { id: parseInt(req.params.id) },
-    include: { children: true },
+    include: {
+      children: {
+        include: {
+          attributes: {
+            include: { assignment: { include: { attribute: true } } },
+          },
+        },
+      },
+    },
   });
   if (!asset)
     return res
