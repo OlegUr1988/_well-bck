@@ -1,22 +1,12 @@
 import { z } from "zod";
 
-export const areaSchema = z.object({
-  name: z.string().min(1).max(255),
-});
-
 export const assetSchema = z.object({
   name: z.string().min(1).max(255),
-  areaId: z.number().min(1),
-});
-
-export const equipmentSchema = z.object({
-  name: z.string().min(1).max(255),
-  assetId: z.number().min(1),
 });
 
 export const attributeSchema = z.object({
   name: z.string().min(1).max(255),
-  equipmentId: z.number().min(1),
+  assetId: z.number().min(1),
   attributeTypeId: z.number().min(1),
 });
 
