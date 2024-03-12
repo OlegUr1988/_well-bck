@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import PHDTag from "../entities/PHDTag";
 import {
   RequestBody,
   RequestParams,
@@ -11,6 +10,7 @@ import { exportToExcel, importFromExcel } from "../misc/excel/PHDTags";
 import { prisma } from "../prisma/client";
 import { phdTagSchema } from "../schemas";
 import { upload } from "../storage";
+import { PHDTag } from "@prisma/client";
 
 const router = express.Router();
 
