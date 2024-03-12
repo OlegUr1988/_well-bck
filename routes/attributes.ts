@@ -1,18 +1,19 @@
 import express, { Request, Response } from "express";
-import Attribute from "../entities/Attribute";
-import {
-  RequestBody,
-  RequestParams,
-  ResponseBody,
-} from "../entities/RequestQuery";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { attributeSchema } from "../schemas";
+import { Attribute } from "@prisma/client";
+import {
+  RequestParams,
+  ResponseBody,
+  RequestBody,
+  RequestQuery,
+} from "../entities/RequestQuery";
 
 const router = express.Router();
 
-interface AttributeQuery {
-  equipmentId: string;
+interface AttributeQuery extends RequestQuery {
+  assetId: string;
 }
 
 router.get(
@@ -21,11 +22,11 @@ router.get(
     req: Request<RequestParams, ResponseBody, RequestBody, AttributeQuery>,
     res: Response
   ) => {
-    const { equipmentId } = req.query;
+    const { assetId } = req.query as AttributeQuery;
 
-    const where = equipmentId
+    const where = assetId
       ? {
-          equipmentId: parseInt(equipmentId),
+          assetId: parseInt(assetId),
         }
       : {};
 
@@ -41,7 +42,7 @@ router.get(
 router.get("/:id", async (req, res) => {
   const attribute = await prisma.attribute.findUnique({
     where: { id: parseInt(req.params.id) },
-    include: { equipment: true },
+    include: { asset: true },
   });
   if (!attribute)
     return res
@@ -56,18 +57,18 @@ router.post("/", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, equipmentId, attributeTypeId } = req.body as Attribute;
+  const { name, assetId, attributeTypeId } = req.body as Attribute;
 
-  const equipment = await prisma.equipment.findUnique({
-    where: { id: equipmentId },
+  const equipment = await prisma.asset.findUnique({
+    where: { id: assetId },
   });
   if (!equipment)
-    return res.status(400).send({ message: "Invalid equipment was provided" });
+    return res.status(400).send({ message: "Invalid asset was provided" });
 
   const newAttribute = await prisma.attribute.create({
     data: {
       name,
-      equipmentId,
+      assetId,
       attributeTypeId,
     },
   });
@@ -80,7 +81,7 @@ router.put("/:id", auth, async (req, res) => {
 
   const attribute = await prisma.attribute.findUnique({
     where: { id },
-    include: { equipment: true },
+    include: { asset: true },
   });
   if (!attribute)
     return res
@@ -91,17 +92,17 @@ router.put("/:id", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, equipmentId, attributeTypeId } = req.body as Attribute;
+  const { name, assetId, attributeTypeId } = req.body as Attribute;
 
-  const equipment = await prisma.equipment.findUnique({
-    where: { id: equipmentId },
+  const equipment = await prisma.asset.findUnique({
+    where: { id: assetId },
   });
   if (!equipment)
     return res.status(400).send({ message: "Invalid equipment was provided" });
 
   const updatedAttribute = await prisma.attribute.update({
     where: { id },
-    data: { name, equipmentId, attributeTypeId },
+    data: { name, assetId, attributeTypeId },
   });
 
   res.send(updatedAttribute);

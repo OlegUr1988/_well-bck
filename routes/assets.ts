@@ -1,18 +1,18 @@
 import express, { Request, Response } from "express";
-import Asset from "../entities/Asset";
-import {
-  RequestBody,
-  RequestParams,
-  ResponseBody,
-} from "../entities/RequestQuery";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { assetSchema } from "../schemas";
+import { Asset } from "@prisma/client";
+import {
+  RequestBody,
+  RequestParams,
+  RequestQuery,
+  ResponseBody,
+} from "../entities/RequestQuery";
 
 const router = express.Router();
 
-interface AssetQuery {
-  areaId: string;
+interface AssetQuery extends RequestQuery {
   name: string;
 }
 
@@ -22,10 +22,12 @@ router.get(
     req: Request<RequestParams, ResponseBody, RequestBody, AssetQuery>,
     res: Response
   ) => {
-    const { areaId, name } = req.query;
+    const { name } = req.query as AssetQuery;
 
     if (name) {
-      const asset = await prisma.asset.findUnique({ where: { name } });
+      const asset = await prisma.asset.findUnique({
+        where: { name },
+      });
       if (!asset)
         return res
           .status(404)
@@ -33,13 +35,7 @@ router.get(
       return res.send(asset);
     }
 
-    const where = areaId
-      ? {
-          areaId: parseInt(areaId),
-        }
-      : {};
-
-    const assets = await prisma.asset.findMany({ where });
+    const assets = await prisma.asset.findMany({ include: { children: true } });
 
     res.send(assets);
   }
@@ -48,7 +44,15 @@ router.get(
 router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
     where: { id: parseInt(req.params.id) },
-    include: { area: true },
+    include: {
+      children: {
+        include: {
+          attributes: {
+            include: { assignment: { include: { attribute: true } } },
+          },
+        },
+      },
+    },
   });
   if (!asset)
     return res
@@ -63,11 +67,7 @@ router.post("/", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, areaId } = req.body as Asset;
-
-  const area = await prisma.area.findUnique({ where: { id: areaId } });
-  if (!area)
-    return res.status(400).send({ message: "Invalid area was provided" });
+  const { name, parentAssetId } = req.body as Asset;
 
   const assetWithSameName = await prisma.asset.findUnique({
     where: { name },
@@ -77,10 +77,20 @@ router.post("/", auth, async (req, res) => {
       .status(400)
       .send({ message: "The asset with the same name already exist." });
 
+  if (parentAssetId) {
+    const parentAsset = await prisma.asset.findUnique({
+      where: { id: parentAssetId },
+    });
+    if (!parentAsset)
+      return res
+        .status(400)
+        .send({ message: "Invalid parrent asset ID was provided" });
+  }
+
   const newAsset = await prisma.asset.create({
     data: {
       name,
-      areaId,
+      parentAssetId,
     },
   });
 
@@ -92,7 +102,6 @@ router.put("/:id", auth, async (req, res) => {
 
   const asset = await prisma.asset.findUnique({
     where: { id },
-    include: { area: true },
   });
   if (!asset)
     return res
@@ -103,11 +112,7 @@ router.put("/:id", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, areaId } = req.body as Asset;
-
-  const area = await prisma.area.findUnique({ where: { id: areaId } });
-  if (!asset)
-    return res.status(400).send({ message: "Invalid area was provided" });
+  const { name } = req.body as Asset;
 
   const assetWithSameName = await prisma.asset.findUnique({
     where: { name },
@@ -123,7 +128,7 @@ router.put("/:id", auth, async (req, res) => {
 
   const updatedAsset = await prisma.asset.update({
     where: { id },
-    data: { name, areaId },
+    data: { name },
   });
 
   res.send(updatedAsset);
@@ -135,7 +140,7 @@ router.delete("/:id", auth, async (req, res) => {
   const asset = await prisma.asset.findUnique({
     where: { id },
     include: {
-      equipment: true,
+      children: true,
     },
   });
   if (!asset)
@@ -143,10 +148,10 @@ router.delete("/:id", auth, async (req, res) => {
       .status(404)
       .send({ message: "The asset with the given ID was not found." });
 
-  if (asset.equipment.length)
+  if (asset.children.length)
     return res
       .status(500)
-      .send({ message: "The asset has one or more equipments" });
+      .send({ message: "The asset has one or more subassets" });
 
   await prisma.asset.delete({ where: { id } });
 

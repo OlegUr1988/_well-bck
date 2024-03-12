@@ -2,13 +2,9 @@ import express from "express";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { assignmentSchema, updateAssignmentSchema } from "../schemas";
+import { Assignment } from "@prisma/client";
 
 const router = express.Router();
-
-interface AssignmentQuery {
-  attributeId: number;
-  PHDTagId: number;
-}
 
 router.get("/:attrId", async (req, res) => {
   const { attrId } = req.params;
@@ -28,7 +24,7 @@ router.post("/", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { attributeId, PHDTagId } = req.body as AssignmentQuery;
+  const { attributeId, PHDTagId } = req.body as Assignment;
 
   const existingAssignment = await prisma.assignment.findUnique({
     where: {
@@ -74,7 +70,7 @@ router.put("/:attrId/:tagId", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { PHDTagId } = req.body as AssignmentQuery;
+  const { PHDTagId } = req.body as Assignment;
 
   const existingAssignment = await prisma.assignment.findUnique({
     where: {
