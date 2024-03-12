@@ -1,22 +1,32 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import auth from "../middlewares/auth";
 import { prisma } from "../prisma/client";
 import { attributeSchema } from "../schemas";
 import { Attribute } from "@prisma/client";
+import {
+  RequestParams,
+  ResponseBody,
+  RequestBody,
+  RequestQuery,
+} from "../entities/RequestQuery";
 
 const router = express.Router();
+
+interface AttributeQuery extends RequestQuery {
+  assetId: string;
+}
 
 router.get(
   "/",
   async (
-    req,
-    res
+    req: Request<RequestParams, ResponseBody, RequestBody, AttributeQuery>,
+    res: Response
   ) => {
-    const { assetId } = req.query as unknown as Attribute;
+    const { assetId } = req.query as AttributeQuery;
 
     const where = assetId
       ? {
-          assetId,
+          assetId: parseInt(assetId),
         }
       : {};
 

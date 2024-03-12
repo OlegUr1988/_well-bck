@@ -1,0 +1,22 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- DropForeignKey
+ALTER TABLE [dbo].[Attribute] DROP CONSTRAINT [Attribute_assetId_fkey];
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [Attribute_assetId_fkey] FOREIGN KEY ([assetId]) REFERENCES [dbo].[Asset]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

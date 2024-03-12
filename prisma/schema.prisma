@@ -34,7 +34,7 @@ model Attribute {
   attributeTypeId Int
 
   attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
-  asset         Asset         @relation(fields: [assetId], references: [id])
+  asset         Asset         @relation(fields: [assetId], references: [id], onDelete: Cascade)
   assignment    Assignment[]
 }
 
