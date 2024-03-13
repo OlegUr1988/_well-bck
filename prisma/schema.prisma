@@ -23,10 +23,22 @@ model Asset {
   parentAssetId Int?
   utilityTypeId Int
 
+  target      Target?
   attributes  Attribute[]
   parentAsset Asset?      @relation("Assets", fields: [parentAssetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   utilityType UtilityType @relation(fields: [utilityTypeId], references: [id])
   children    Asset[]     @relation("Assets")
+}
+
+model Target {
+  id                              Int     @id @default(autoincrement())
+  productionTarget                Decimal
+  energyConsumptionTarget         Decimal
+  specificEnergyConsupmtionTarget Decimal
+  CO2EmissionTarget               Decimal
+  assetId                         Int     @unique
+
+  asset Asset @relation(fields: [assetId], references: [id])
 }
 
 model AttributeType {
