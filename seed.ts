@@ -26,12 +26,13 @@ const attributeTypes = [
   { name: "Duty" },
   { name: "Design Loss" },
   { name: "Operating Loss" },
+  { name: "Area Attribute" },
 ];
 
 const fillTables = async () => {
   try {
     await prisma.dataSource.create({ data: dataSource });
-    await prisma.utilityType.createMany({data: utilityTypes})
+    await prisma.utilityType.createMany({ data: utilityTypes });
     await prisma.unit.createMany({ data: units });
     await prisma.attributeType.createMany({ data: attributeTypes });
   } catch (error) {
