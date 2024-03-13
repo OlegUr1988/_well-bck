@@ -10,13 +10,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model UtilityType {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
+
+  assets Asset[]
+}
+
 model Asset {
   id            Int    @id @default(autoincrement())
   name          String @unique @db.VarChar(255)
   parentAssetId Int?
+  utilityTypeId Int
 
   attributes  Attribute[]
   parentAsset Asset?      @relation("Assets", fields: [parentAssetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  utilityType UtilityType @relation(fields: [utilityTypeId], references: [id])
   children    Asset[]     @relation("Assets")
 }
 
@@ -24,7 +33,7 @@ model AttributeType {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
 
-  attribute Attribute[]
+  attributes Attribute[]
 }
 
 model Attribute {
@@ -35,14 +44,14 @@ model Attribute {
 
   attributeType AttributeType @relation(fields: [attributeTypeId], references: [id])
   asset         Asset         @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  assignment    Assignment[]
+  assignments   Assignment[]
 }
 
 model Unit {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
 
-  PHDTag PHDTag[]
+  PHDTags PHDTag[]
 }
 
 model PHDTag {
@@ -50,9 +59,9 @@ model PHDTag {
   tagname String @unique @db.VarChar(300)
   unitId  Int
 
-  unit       Unit         @relation(fields: [unitId], references: [id])
-  record     Record[]
-  assignment Assignment[]
+  unit        Unit         @relation(fields: [unitId], references: [id])
+  records     Record[]
+  assignments Assignment[]
 }
 
 model Assignment {
