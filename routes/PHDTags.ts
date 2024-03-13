@@ -153,14 +153,14 @@ router.delete("/:id", auth, async (req, res) => {
 
   const tag = await prisma.pHDTag.findUnique({
     where: { id },
-    include: { assignment: true },
+    include: { assignments: true },
   });
   if (!tag)
     return res
       .status(404)
       .send({ message: "The PHD tag with the given ID was not found." });
 
-  if (tag.assignment.length)
+  if (tag.assignments.length)
     return res
       .status(500)
       .send({ message: "The tag has one or more assignments" });

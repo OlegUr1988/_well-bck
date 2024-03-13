@@ -3,10 +3,19 @@ BEGIN TRY
 BEGIN TRAN;
 
 -- CreateTable
+CREATE TABLE [dbo].[UtilityType] (
+    [id] INT NOT NULL IDENTITY(1,1),
+    [name] VARCHAR(255) NOT NULL,
+    CONSTRAINT [UtilityType_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [UtilityType_name_key] UNIQUE NONCLUSTERED ([name])
+);
+
+-- CreateTable
 CREATE TABLE [dbo].[Asset] (
     [id] INT NOT NULL IDENTITY(1,1),
     [name] VARCHAR(255) NOT NULL,
     [parentAssetId] INT,
+    [utilityTypeId] INT NOT NULL,
     CONSTRAINT [Asset_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Asset_name_key] UNIQUE NONCLUSTERED ([name])
 );
@@ -84,10 +93,13 @@ CREATE TABLE [dbo].[User] (
 ALTER TABLE [dbo].[Asset] ADD CONSTRAINT [Asset_parentAssetId_fkey] FOREIGN KEY ([parentAssetId]) REFERENCES [dbo].[Asset]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
+ALTER TABLE [dbo].[Asset] ADD CONSTRAINT [Asset_utilityTypeId_fkey] FOREIGN KEY ([utilityTypeId]) REFERENCES [dbo].[UtilityType]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [Attribute_attributeTypeId_fkey] FOREIGN KEY ([attributeTypeId]) REFERENCES [dbo].[AttributeType]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [Attribute_assetId_fkey] FOREIGN KEY ([assetId]) REFERENCES [dbo].[Asset]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Attribute] ADD CONSTRAINT [Attribute_assetId_fkey] FOREIGN KEY ([assetId]) REFERENCES [dbo].[Asset]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[PHDTag] ADD CONSTRAINT [PHDTag_unitId_fkey] FOREIGN KEY ([unitId]) REFERENCES [dbo].[Unit]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;

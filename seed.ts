@@ -5,6 +5,15 @@ const dataSource = {
   port: 3152,
 };
 
+const utilityTypes = [
+  { name: "Area" },
+  { name: "Gas" },
+  { name: "Steam" },
+  { name: "Electricity" },
+  { name: "Heat" },
+  { name: "Subasset" },
+];
+
 const units = [
   {
     name: "%",
@@ -22,6 +31,7 @@ const attributeTypes = [
 const fillTables = async () => {
   try {
     await prisma.dataSource.create({ data: dataSource });
+    await prisma.utilityType.createMany({data: utilityTypes})
     await prisma.unit.createMany({ data: units });
     await prisma.attributeType.createMany({ data: attributeTypes });
   } catch (error) {

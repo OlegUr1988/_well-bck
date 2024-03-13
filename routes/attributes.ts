@@ -32,7 +32,7 @@ router.get(
 
     const attributes = await prisma.attribute.findMany({
       where,
-      include: { attributeType: true, assignment: true },
+      include: { attributeType: true, assignments: true },
     });
 
     res.send(attributes);

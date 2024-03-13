@@ -48,7 +48,7 @@ router.get("/:id", async (req, res) => {
       children: {
         include: {
           attributes: {
-            include: { assignment: { include: { attribute: true } } },
+            include: { assignments: { include: { attribute: true } } },
           },
         },
       },
@@ -67,7 +67,7 @@ router.post("/", auth, async (req, res) => {
   if (!validation.success)
     return res.status(400).send(validation.error.format());
 
-  const { name, parentAssetId } = req.body as Asset;
+  const { name, parentAssetId, utilityTypeId } = req.body as Asset;
 
   const assetWithSameName = await prisma.asset.findUnique({
     where: { name },
@@ -91,6 +91,7 @@ router.post("/", auth, async (req, res) => {
     data: {
       name,
       parentAssetId,
+      utilityTypeId,
     },
   });
 
