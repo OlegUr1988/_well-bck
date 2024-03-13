@@ -130,14 +130,14 @@ router.delete("/:id", auth, async (req, res) => {
 
   const unit = await prisma.unit.findUnique({
     where: { id },
-    include: { PHDTag: true },
+    include: { PHDTags: true },
   });
   if (!unit)
     return res
       .status(404)
       .send({ message: "The unit with the given ID was not found." });
 
-  if (unit.PHDTag.length)
+  if (unit.PHDTags.length)
     return res.status(500).send({
       message:
         "There are assignments to the units. Please delete according assigned tags",
