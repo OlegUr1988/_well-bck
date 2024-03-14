@@ -45,6 +45,7 @@ router.get("/:id", async (req, res) => {
   const asset = await prisma.asset.findUnique({
     where: { id: parseInt(req.params.id) },
     include: {
+      utilityType: true,
       children: {
         include: {
           attributes: {
