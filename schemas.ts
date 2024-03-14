@@ -46,3 +46,18 @@ export const updateUserSchema = z.object({
 export const updateUserPasswordSchema = z.object({
   password: z.string().min(4).max(255),
 });
+
+export const targetSchema = z.object({
+  productionTarget: z.number(),
+  energyConsumptionTarget: z.number(),
+  specificEnergyConsupmtionTarget: z.number(),
+  CO2EmissionTarget: z.number(),
+  assetId: z.number().min(1),
+});
+
+export const updateTargetSchema = z.object({
+  productionTarget: z.number().optional(),
+  energyConsumptionTarget: z.number().optional(),
+  specificEnergyConsupmtionTarget: z.number().optional(),
+  CO2EmissionTarget: z.number().optional(),
+});
