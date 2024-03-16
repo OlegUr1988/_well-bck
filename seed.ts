@@ -11,7 +11,6 @@ const utilityTypes = [
   { name: "Steam" },
   { name: "Electricity" },
   { name: "Heat" },
-  { name: "Subasset" },
 ];
 
 const units = [
@@ -25,6 +24,7 @@ const units = [
 
 const attributeTypes = [
   { name: "Duty" },
+  { name: "CO2 Emission" },
   { name: "Design Loss" },
   { name: "Operating Loss" },
   { name: "Area Attribute" },
