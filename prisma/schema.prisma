@@ -38,7 +38,7 @@ model Target {
   CO2EmissionTarget               Decimal
   assetId                         Int     @unique
 
-  asset Asset @relation(fields: [assetId], references: [id])
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 }
 
 model AttributeType {
