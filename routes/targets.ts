@@ -61,7 +61,7 @@ router.post("/", auth, async (req, res) => {
   });
   if (target)
     return res
-      .send(400)
+      .status(400)
       .send({ message: "The targets for this asset are already set" });
 
   const newTarget = await prisma.target.create({
@@ -74,7 +74,7 @@ router.post("/", auth, async (req, res) => {
     },
   });
 
-  res.send(201).send(newTarget);
+  res.status(201).send(newTarget);
 });
 
 router.put("/:id", auth, async (req, res) => {
