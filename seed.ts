@@ -21,6 +21,7 @@ const units = [
   { name: "kWh" },
   { name: "ton CO2" },
   { name: "ton/hr" },
+  { name: "MMBTU/ton" },
 ];
 
 const attributeTypes = [
