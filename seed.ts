@@ -17,6 +17,7 @@ const units = [
   {
     name: "%",
   },
+  { name: "kW" },
   { name: "kWh" },
   { name: "ton CO2" },
   { name: "ton/hr" },
