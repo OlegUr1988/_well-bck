@@ -8,6 +8,7 @@ import assignments from "./routes/assignments";
 import attributeTypes from "./routes/attributeTypes";
 import attributes from "./routes/attributes";
 import auth from "./routes/auth";
+import constants from "./routes/constants";
 import dataSources from "./routes/dataSources";
 import records from "./routes/records";
 import targets from "./routes/targets";
@@ -36,6 +37,7 @@ app.use("/api/assignments", assignments);
 app.use("/api/targets", targets);
 app.use("/api/records", records);
 app.use("/api/data-sources", dataSources);
+app.use("/api/constants", constants);
 app.use("/api/users", users);
 app.use("/api/auth", auth);
 

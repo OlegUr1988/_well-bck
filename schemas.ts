@@ -61,3 +61,7 @@ export const updateTargetSchema = z.object({
   specificEnergyConsupmtionTarget: z.number().optional(),
   CO2EmissionTarget: z.number().optional(),
 });
+
+export const updateConstantSchema = z.object({
+  value: z.number(),
+});

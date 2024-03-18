@@ -95,6 +95,12 @@ model Record {
   PHDTag PHDTag @relation(fields: [PHDTagId], references: [id], onDelete: Cascade)
 }
 
+model Constant {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique @db.VarChar(255)
+  value Decimal
+}
+
 model DataSource {
   id   Int    @id @default(autoincrement())
   host String @db.VarChar(300)

@@ -30,12 +30,15 @@ const attributeTypes = [
   { name: "Area Attribute" },
 ];
 
+const constants = [{ name: "CO2 conversion coefficient", value: 0.181048239 }];
+
 const fillTables = async () => {
   try {
     await prisma.dataSource.create({ data: dataSource });
     await prisma.utilityType.createMany({ data: utilityTypes });
     await prisma.unit.createMany({ data: units });
     await prisma.attributeType.createMany({ data: attributeTypes });
+    await prisma.constant.createMany({data: constants})
   } catch (error) {
     console.log(error);
   }
