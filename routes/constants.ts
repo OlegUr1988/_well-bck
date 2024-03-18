@@ -1,3 +1,4 @@
+import { Constant } from "@prisma/client";
 import express, { Request, Response } from "express";
 import {
   RequestBody,
@@ -7,47 +8,57 @@ import {
 } from "../entities/RequestQuery";
 import { prisma } from "../prisma/client";
 import { updateConstantSchema } from "../schemas";
-import { Constant } from "@prisma/client";
 
 const router = express.Router();
-
-interface ConstantQuery extends RequestQuery {
-  name: string;
-}
 
 router.get(
   "/",
   async (
-    req: Request<RequestParams, ResponseBody, RequestBody, ConstantQuery>,
+    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
     res: Response
   ) => {
-    const { name } = req.query as ConstantQuery;
+    const { page, pageSize, searchedName } = req.query;
 
-    if (name) {
-      const constant = await prisma.constant.findUnique({
-        where: { name },
-      });
-      if (!constant)
-        return res
-          .status(404)
-          .send({ message: "The constant with given name was not found." });
-      return res.send(constant);
-    }
+    const where = {
+      name: {
+        contains: searchedName,
+      },
+    };
 
-    const constants = await prisma.constant.findMany();
+    const orderBy = { name: "asc" } as const;
 
-    res.send(constants);
+    const count = (await prisma.constant.findMany({ where })).length;
+
+    const constants =
+      page && pageSize
+        ? await prisma.constant.findMany({
+            where,
+            orderBy,
+            skip: (parseInt(page) - 1) * parseInt(pageSize),
+            take: parseInt(pageSize),
+          })
+        : await prisma.constant.findMany({
+            orderBy,
+            where,
+          });
+
+    res.send({
+      count,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      results: constants,
+    });
   }
 );
 
-router.get("/:id", async (req, res) => {
+router.get("/:name", async (req, res) => {
   const constant = await prisma.constant.findUnique({
-    where: { id: parseInt(req.params.id) },
+    where: { name: req.params.name },
   });
   if (!constant)
     return res
-      .send(404)
-      .send({ message: "The constant with the given ID was not found." });
+      .status(404)
+      .send({ message: "The constant with the given name was not found." });
 
   res.send(constant);
 });
@@ -60,7 +71,7 @@ router.put("/:id", async (req, res) => {
   });
   if (!constant)
     return res
-      .send(404)
+      .status(404)
       .send({ message: "The constant with the given ID was not found." });
 
   const validation = updateConstantSchema.safeParse(req.body);
