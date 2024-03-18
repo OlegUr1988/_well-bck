@@ -21,12 +21,10 @@ const units = [
   { name: "kWh" },
   { name: "ton CO2" },
   { name: "ton/hr" },
-  { name: "MMBTU/ton" },
 ];
 
 const attributeTypes = [
   { name: "Duty" },
-  { name: "CO2 Emission" },
   { name: "Design Loss" },
   { name: "Operating Loss" },
   { name: "Area Attribute" },
