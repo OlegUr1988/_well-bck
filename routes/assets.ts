@@ -27,6 +27,17 @@ router.get(
     if (name) {
       const asset = await prisma.asset.findUnique({
         where: { name },
+        include: {
+          attributes: {
+            include: {
+              assignments: { include: { attribute: true } },
+            },
+          },
+          children: {
+            include: { attributes: { include: { assignments: true } } },
+          },
+          target: true,
+        },
       });
       if (!asset)
         return res
