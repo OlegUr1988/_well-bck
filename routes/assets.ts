@@ -1,19 +1,20 @@
-import express, { Request, Response } from "express";
-import auth from "../middlewares/auth";
-import { prisma } from "../prisma/client";
-import { assetSchema } from "../schemas";
 import { Asset } from "@prisma/client";
+import express, { Request, Response } from "express";
 import {
   RequestBody,
   RequestParams,
   RequestQuery,
   ResponseBody,
 } from "../entities/RequestQuery";
+import auth from "../middlewares/auth";
+import { prisma } from "../prisma/client";
+import { assetSchema } from "../schemas";
 
 const router = express.Router();
 
 interface AssetQuery extends RequestQuery {
   name: string;
+  ids: string[];
 }
 
 router.get(
@@ -22,7 +23,7 @@ router.get(
     req: Request<RequestParams, ResponseBody, RequestBody, AssetQuery>,
     res: Response
   ) => {
-    const { name } = req.query as AssetQuery;
+    const { name, ids } = req.query as AssetQuery;
 
     if (name) {
       const asset = await prisma.asset.findUnique({
@@ -46,7 +47,26 @@ router.get(
       return res.send(asset);
     }
 
-    const assets = await prisma.asset.findMany({ include: { children: true } });
+    let assets: Asset[] = [];
+    if (ids) {
+      for (let id of ids) {
+        const asset = await prisma.asset.findUnique({
+          where: {
+            id: parseInt(id),
+          },
+          include: {
+            children: {
+              include: { attributes: { include: { assignments: true } } },
+            },
+          },
+        });
+        if (asset) {
+          assets.push(asset);
+        }
+      }
+    } else {
+      assets = await prisma.asset.findMany({ include: { children: true } });
+    }
 
     res.send(assets);
   }
