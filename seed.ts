@@ -6,6 +6,7 @@ const dataSource = {
 };
 
 const utilityTypes = [
+  { name: "Plant" },
   { name: "Area" },
   { name: "Gas" },
   { name: "Steam" },
@@ -38,7 +39,7 @@ const fillTables = async () => {
     await prisma.utilityType.createMany({ data: utilityTypes });
     await prisma.unit.createMany({ data: units });
     await prisma.attributeType.createMany({ data: attributeTypes });
-    await prisma.constant.createMany({data: constants})
+    await prisma.constant.createMany({ data: constants });
   } catch (error) {
     console.log(error);
   }
