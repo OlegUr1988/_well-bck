@@ -1,5 +1,8 @@
 import express from "express";
+import fs from "fs";
+import https from "https";
 import path from "path";
+import { getCertPassword, getCertPath } from "./digitCert";
 import job from "./jobs/job";
 import cors from "./middlewares/cors";
 import PHDTags from "./routes/PHDTags";
@@ -48,4 +51,17 @@ app.get("*", (req, res) => {
 job;
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listen on http:\\\\localhost:${port}`));
+
+if (app.get("env") === "development") {
+  app.listen(port, () => console.log(`Listen on http:\\\\localhost:${port}`));
+} else {
+  const options = {
+    pfx: fs.readFileSync(getCertPath()),
+    passphrase: getCertPassword(),
+  };
+
+  const httpsServer = https.createServer(options, app);
+  httpsServer.listen(port, () =>
+    console.log(`Listen on https:\\\\localhost:${port}`)
+  );
+}
