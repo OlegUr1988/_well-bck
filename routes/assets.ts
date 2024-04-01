@@ -55,6 +55,11 @@ router.get(
             id: parseInt(id),
           },
           include: {
+            attributes: {
+              include: {
+                assignments: { include: { attribute: true } },
+              },
+            },
             children: {
               include: { attributes: { include: { assignments: true } } },
             },
