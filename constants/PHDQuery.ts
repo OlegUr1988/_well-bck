@@ -5,6 +5,7 @@ const PHDQuery: GetDataQuery = {
   TagName: "",
   StartTime: "NOW-24H",
   EndTime: "NOW",
+  RawData: false,
   OutputTimeFormat: 2,
   MaxRows: 24,
   MinimumConfidense: 100,

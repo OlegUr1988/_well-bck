@@ -7,13 +7,15 @@ import {
 } from "../../services/api-client";
 
 const getAverageOfDailyRecord = async (tag: string) => {
-  const params: GetDataQuery = { ...PHDQuery, TagName: tag };
+  const params: GetDataQuery = {
+    ...PHDQuery,
+    TagName: tag,
+    ReductionData: "Average",
+  };
   try {
     const res: GetDataResponse[] = await getData({ params });
 
-    const values = res[0].Value;
-
-    return values.reduce((acc, value) => acc + value, 0) / values.length;
+    return res[0].Value[0];
   } catch (error) {
     const { response } = error as HttpError;
     throw Error(response?.data.message);
