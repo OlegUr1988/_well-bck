@@ -12,7 +12,7 @@ const writeDailyRecords = async () => {
   try {
     const tags = await prisma.pHDTag.findMany({ include: { unit: true } });
     for (let tag of tags) {
-      const sum =
+      const value =
         tag.unit.name === "%"
           ? await getAverageOfDailyRecord(tag.tagname)
           : await getSumOfDailyRecord(tag.tagname);
@@ -20,10 +20,15 @@ const writeDailyRecords = async () => {
       await prisma.record.create({
         data: {
           PHDTagId: tag.id,
-          value: sum,
+          value: value | 0,
           timestamp,
         },
       });
+      JobLogger.info(
+        `Tagname: ${tag.tagname}, Value: ${
+          value ? value : "replaced with 0 since no value provided by PHD"
+        }, Units: ${tag.unit.name}`
+      );
     }
     JobLogger.info("Job successfully executed...");
     JobLogger.info(`Added ${tags.length} records`);

@@ -24,6 +24,8 @@ export interface GetDataQuery {
   TagName: string;
   StartTime: string;
   EndTime: string;
+  RawData?: boolean;
+  ReductionData?: "Average";
   OutputTimeFormat: number;
   SampleInterval: number;
   MinimumConfidense: number;
