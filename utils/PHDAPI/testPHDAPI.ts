@@ -1,3 +1,3 @@
 import { getTags } from "../../services/api-client";
 
-getTags.then((data) => console.log(data));
+getTags().then((data) => console.log(data));
