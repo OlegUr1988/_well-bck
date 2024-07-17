@@ -22,6 +22,7 @@ export interface GetDataResponse {
 
 export interface GetDataQuery {
   TagName: string;
+  TimeFormat?: number;
   StartTime: string;
   EndTime: string;
   RawData?: boolean;
@@ -29,7 +30,7 @@ export interface GetDataQuery {
   OutputTimeFormat: number;
   SampleInterval: number;
   MinimumConfidense: number;
-  MaxRows: number;
+  MaxRows?: number;
 }
 
 interface AxiosValidationError {
