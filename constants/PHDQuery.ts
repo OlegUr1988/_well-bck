@@ -7,7 +7,6 @@ const PHDQuery: GetDataQuery = {
   EndTime: "NOW",
   RawData: false,
   OutputTimeFormat: 2,
-  MaxRows: 24,
   MinimumConfidense: 100,
   SampleInterval: ms("1h"),
 };

@@ -1,4 +1,6 @@
 import _ from "lodash";
+import moment from "moment";
+import { DateTimeFormat } from "../../constants/DateTimeFormats";
 import PHDQuery from "../../constants/PHDQuery";
 import {
   GetDataQuery,
@@ -19,12 +21,24 @@ const getSumOfDailyRecord = async (tag: string) => {
 
 const getAveragesForLastDay = async (tag: string) => {
   const averages: number[] = [];
-  for (let hour = 24; hour > 0; hour--) {
+  const previousDay = moment()
+    .subtract(1, "days")
+    .startOf("day")
+    .format(DateTimeFormat);
+  const hoursInDay = 24;
+
+  for (let hour = 0; hour < hoursInDay; hour++) {
     const params: GetDataQuery = {
       ...PHDQuery,
       TagName: tag,
-      StartTime: `NOW-${hour}H`,
-      EndTime: `NOW-${hour - 1}H`,
+      TimeFormat: 6,
+
+      StartTime: moment(previousDay, [DateTimeFormat])
+        .add(hour, "hours")
+        .format(DateTimeFormat),
+      EndTime: moment(previousDay, [DateTimeFormat])
+        .add(hour + 1, "hours")
+        .format(DateTimeFormat),
       ReductionData: "Average",
     };
 
@@ -36,6 +50,7 @@ const getAveragesForLastDay = async (tag: string) => {
       throw Error(response?.data.message);
     }
   }
+
   return averages;
 };
 
