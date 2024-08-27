@@ -15,7 +15,7 @@ const getSumOfDailyRecord = async (tag: string) => {
     return _.sum(averages);
   } catch (error) {
     const { response } = error as HttpError;
-    throw Error(response?.data.message);
+    if (response) throw Error(response?.data.message);
   }
 };
 
@@ -44,10 +44,12 @@ const getAveragesForLastDay = async (tag: string) => {
 
     try {
       const res: GetDataResponse[] = await getData({ params });
-      averages.push(res[0].Value[0]);
+      res[0].Value.length > 0
+        ? averages.push(res[0].Value[0])
+        : averages.push(0);
     } catch (error) {
       const { response } = error as HttpError;
-      throw Error(response?.data.message);
+      if (response) throw Error(response?.data.message);
     }
   }
 

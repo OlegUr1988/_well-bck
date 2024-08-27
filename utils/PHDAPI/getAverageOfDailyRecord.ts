@@ -25,10 +25,10 @@ const getAverageOfDailyRecord = async (tag: string) => {
   };
   try {
     const res: GetDataResponse[] = await getData({ params });
-    return res[0].Value[0];
+    return res[0].Value.length > 0 ? res[0].Value[0] : 0;
   } catch (error) {
     const { response } = error as HttpError;
-    throw Error(response?.data.message);
+    if (response) throw Error(response?.data.message);
   }
 };
 
