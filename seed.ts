@@ -25,8 +25,8 @@ const units = [
 
 const attributeTypes = [
   { name: "Duty" },
-  { name: "Non-controllable Loss" },
   { name: "Manageable Loss" },
+  { name: "Non-controllable Loss" },
   { name: "Area Attribute" },
 ];
 
