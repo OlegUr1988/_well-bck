@@ -8,6 +8,7 @@ import {
   HttpError,
   getData,
 } from "../../services/api-client";
+import { getPreviousDayTime } from "./helperFunctions";
 
 const getSumOfDailyRecord = async (tag: string) => {
   try {
@@ -21,10 +22,7 @@ const getSumOfDailyRecord = async (tag: string) => {
 
 const getAveragesForLastDay = async (tag: string) => {
   const averages: number[] = [];
-  const previousDay = moment()
-    .subtract(1, "days")
-    .startOf("day")
-    .format(DateTimeFormat);
+  const previousDay = getPreviousDayTime()
   const hoursInDay = 24;
 
   for (let hour = 0; hour < hoursInDay; hour++) {
