@@ -7,13 +7,11 @@ import {
   HttpError,
   getData,
 } from "../../services/api-client";
+import { getPreviousDayTime } from "./helperFunctions";
 
 const getAverageOfDailyRecord = async (tag: string) => {
   const currentDay = moment().startOf("day").format(DateTimeFormat);
-  const previousDay = moment()
-    .subtract(1, "days")
-    .startOf("day")
-    .format(DateTimeFormat);
+  const previousDay = getPreviousDayTime()
 
   const params: GetDataQuery = {
     ...PHDQuery,
