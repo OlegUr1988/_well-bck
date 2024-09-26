@@ -29,7 +29,7 @@ export interface GetDataQuery {
   ReductionData?: "Average";
   OutputTimeFormat: number;
   SampleInterval: number;
-  MinimumConfidense: number;
+  MinimumConfidence: number;
   MaxRows?: number;
 }
 
