@@ -61,7 +61,7 @@ if (app.get("env") === "development") {
   };
 
   const httpsServer = https.createServer(options, app);
-  httpsServer.listen(port, () =>
+  httpsServer.listen({ port, host: "0.0.0.0" }, () =>
     console.log(`Listen on https:\\\\localhost:${port}`)
   );
 }
