@@ -1,0 +1,5 @@
+{
+    "powerquery.client.additionalSymbolsDirectories": [
+        "c:/_ProjectCode/____Wells/aos-bck-energy/.vscode/excel-pq-symbols"
+    ]
+}

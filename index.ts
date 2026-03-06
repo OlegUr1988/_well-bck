@@ -29,7 +29,6 @@ if (!getKey()) {
 
 app.use(express.json());
 app.use(cors);
-app.use(express.static("dist"));
 app.use("/api/assets", assets);
 app.use("/api/units", units);
 app.use("/api/attribute-types", attributeTypes);
@@ -44,16 +43,12 @@ app.use("/api/constants", constants);
 app.use("/api/users", users);
 app.use("/api/auth", auth);
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
-
 job;
 
 const port = process.env.PORT || 3000;
 
 if (app.get("env") === "development") {
-  app.listen(port, () => console.log(`Listen on http:\\\\localhost:${port}`));
+  app.listen(port, () => console.log(`Listen on http://localhost:${port}`));
 } else {
   const options = {
     pfx: fs.readFileSync(getCertPath()),
@@ -62,6 +57,6 @@ if (app.get("env") === "development") {
 
   const httpsServer = https.createServer(options, app);
   httpsServer.listen({ port, host: "0.0.0.0" }, () =>
-    console.log(`Listen on https:\\\\localhost:${port}`)
+    console.log(`Listen on https://localhost:${port}`)
   );
 }

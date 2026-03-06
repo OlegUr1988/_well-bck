@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "SET PORT=3000 & SET NODE_ENV=production & ts-node init.ts & ts-node index.ts",
-    "dev": "nodemon index.ts",
+    "dev": "nodemon --exec ts-node index.ts",
     "test-source": "ts-node utils/PHDAPI/testPHDAPI.ts",
     "write-data": "ts-node utils/PHDAPI/writeData.ts",
     "create-secret": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\" > secret_key.txt",
@@ -19,6 +19,7 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.9.5",
+    "nodemon": "^3.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2"
   },
