@@ -13,6 +13,7 @@ datasource db {
 model UtilityType {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
+  description String? @db.VarChar(255)
 
   assets Asset[]
 }
@@ -44,6 +45,9 @@ model Target {
 model AttributeType {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
+  description String @db.VarChar(255)
+  unitId Int?
+  dataType String @db.VarChar(255)
 
   attributes Attribute[]
 }
@@ -62,6 +66,7 @@ model Attribute {
 model Unit {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
+  description String? @db.VarChar(255)
 
   PHDTags PHDTag[]
 }

@@ -4,7 +4,7 @@ import https from "https";
 import path from "path";
 import { getCertPassword, getCertPath } from "./digitCert";
 import job from "./jobs/job";
-import cors from "./middlewares/cors";
+import cors from "cors";
 import PHDTags from "./routes/PHDTags";
 import assets from "./routes/assets";
 import assignments from "./routes/assignments";
@@ -28,7 +28,7 @@ if (!getKey()) {
 }
 
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 app.use("/api/assets", assets);
 app.use("/api/units", units);
 app.use("/api/attribute-types", attributeTypes);

@@ -1,199 +1,63 @@
-import { Asset } from "@prisma/client";
-import express, { Request, Response } from "express";
-import {
-  RequestBody,
-  RequestParams,
-  RequestQuery,
-  ResponseBody,
-} from "../entities/RequestQuery";
-import auth from "../middlewares/auth";
-import { prisma } from "../prisma/client";
-import { assetSchema } from "../schemas";
+import express, { Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import auth from '../middlewares/auth';
+import admin from '../middlewares/admin';
 
+const prisma = new PrismaClient();
 const router = express.Router();
 
-interface AssetQuery extends RequestQuery {
-  name: string;
-  ids: string[];
-}
-
-router.get(
-  "/",
-  async (
-    req: Request<RequestParams, ResponseBody, RequestBody, AssetQuery>,
-    res: Response
-  ) => {
-    const { name, ids } = req.query as AssetQuery;
-
-    if (name) {
-      const asset = await prisma.asset.findUnique({
-        where: { name },
-        include: {
-          attributes: {
-            include: {
-              assignments: { include: { attribute: true } },
-            },
-          },
-          children: {
-            include: { attributes: { include: { assignments: true } } },
-          },
-          target: true,
-        },
-      });
-      if (!asset)
-        return res
-          .status(404)
-          .send({ message: "The asset with given name was not found." });
-      return res.send(asset);
-    }
-
-    let assets: Asset[] = [];
-    if (ids) {
-      for (let id of ids) {
-        const asset = await prisma.asset.findUnique({
-          where: {
-            id: parseInt(id),
-          },
-          include: {
-            attributes: {
-              include: {
-                assignments: { include: { attribute: true } },
-              },
-            },
-            children: {
-              include: { attributes: { include: { assignments: true } } },
-            },
-          },
-        });
-        if (asset) {
-          assets.push(asset);
-        }
-      }
-    } else {
-      assets = await prisma.asset.findMany({ include: { children: true } });
-    }
-
-    res.send(assets);
-  }
-);
-
-router.get("/:id", async (req, res) => {
-  const asset = await prisma.asset.findUnique({
-    where: { id: parseInt(req.params.id) },
-    include: {
-      utilityType: true,
-      children: {
-        include: {
-          attributes: {
-            include: { assignments: { include: { attribute: true } } },
-          },
-        },
+// GET all assets, including their utility type.
+// The frontend will be responsible for building the tree structure.
+router.get('/', async (req, res) => {
+  try {
+    const assets = await prisma.asset.findMany({
+      include: {
+        utilityType: true,
       },
-    },
-  });
-  if (!asset)
-    return res
-      .status(404)
-      .send({ message: "The asset with the given ID was not found." });
-
-  res.send(asset);
+      orderBy: {
+        name: 'asc',
+      },
+    });
+    res.json(assets);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch assets' });
+  }
 });
 
-router.post("/", auth, async (req, res) => {
-  const validation = assetSchema.safeParse(req.body);
-  if (!validation.success)
-    return res.status(400).send(validation.error.format());
+// POST a new asset
+router.post('/', [auth, admin], async (req: Request, res: Response) => {
+  const { name, parentAssetId, utilityTypeName } = req.body;
 
-  const { name, parentAssetId, utilityTypeId } = req.body as Asset;
-
-  const assetWithSameName = await prisma.asset.findUnique({
-    where: { name },
-  });
-  if (assetWithSameName)
-    return res
-      .status(400)
-      .send({ message: "The asset with the same name already exist." });
-
-  if (parentAssetId) {
-    const parentAsset = await prisma.asset.findUnique({
-      where: { id: parentAssetId },
-    });
-    if (!parentAsset)
-      return res
-        .status(400)
-        .send({ message: "Invalid parrent asset ID was provided" });
+  if (!name || !utilityTypeName) {
+    return res.status(400).json({ error: '`name` and `utilityTypeName` are required.' });
   }
 
-  const newAsset = await prisma.asset.create({
-    data: {
-      name,
-      parentAssetId,
-      utilityTypeId,
-    },
-  });
+  try {
+    const utilityType = await prisma.utilityType.findUnique({
+      where: { name: utilityTypeName },
+    });
 
-  res.status(201).send(newAsset);
-});
+    if (!utilityType) {
+      return res.status(400).json({ error: `UtilityType '${utilityTypeName}' not found.` });
+    }
 
-router.put("/:id", auth, async (req, res) => {
-  const id = parseInt(req.params.id);
+    const newAsset = await prisma.asset.create({
+      data: {
+        name,
+        parentAssetId: parentAssetId ? parseInt(parentAssetId, 10) : null,
+        utilityTypeId: utilityType.id,
+      },
+    });
 
-  const asset = await prisma.asset.findUnique({
-    where: { id },
-  });
-  if (!asset)
-    return res
-      .status(404)
-      .send({ message: "The asset with the given ID was not found." });
-
-  const validation = assetSchema.safeParse(req.body);
-  if (!validation.success)
-    return res.status(400).send(validation.error.format());
-
-  const { name } = req.body as Asset;
-
-  const assetWithSameName = await prisma.asset.findUnique({
-    where: { name },
-  });
-  if (
-    assetWithSameName &&
-    assetWithSameName.name === name &&
-    assetWithSameName.id !== id
-  )
-    return res
-      .status(400)
-      .send({ message: "The asset with the same name already exist." });
-
-  const updatedAsset = await prisma.asset.update({
-    where: { id },
-    data: { name },
-  });
-
-  res.send(updatedAsset);
-});
-
-router.delete("/:id", auth, async (req, res) => {
-  const id = parseInt(req.params.id);
-
-  const asset = await prisma.asset.findUnique({
-    where: { id },
-    include: {
-      children: true,
-    },
-  });
-  if (!asset)
-    return res
-      .status(404)
-      .send({ message: "The asset with the given ID was not found." });
-
-  if (asset.children.length)
-    return res
-      .status(500)
-      .send({ message: "The asset has one or more subassets" });
-
-  await prisma.asset.delete({ where: { id } });
-
-  res.send(asset);
+    res.status(201).json(newAsset);
+  } catch (error: any) {
+    console.error(error);
+    if (error.code === 'P2002' && error.meta?.target?.includes('name')) {
+      return res.status(409).json({ error: `An asset with the name '${name}' already exists.` });
+    }
+    res.status(500).json({ error: 'Failed to create asset' });
+  }
 });
 
 export default router;

@@ -37,7 +37,7 @@ export const importFromExcel = async (req: Request, res: Response) => {
 
     const buffer = req.file.buffer;
     const workbook = new ExcelJs.Workbook();
-    await workbook.xlsx.load(buffer);
+    await workbook.xlsx.load(buffer as any);
     const worksheet = workbook.getWorksheet("PHD Tags");
 
     // check headers
