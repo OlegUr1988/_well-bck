@@ -29,24 +29,35 @@ router.get('/', async (req, res) => {
 router.post('/', [auth, admin], async (req: Request, res: Response) => {
   const { name, parentAssetId, utilityTypeName } = req.body;
 
-  if (!name || !utilityTypeName) {
+  // Default to 'Field' if utilityTypeName is missing
+  const effectiveUtilityTypeName = utilityTypeName || 'Field';
+
+  if (!name || !effectiveUtilityTypeName) {
     return res.status(400).json({ error: '`name` and `utilityTypeName` are required.' });
   }
 
   try {
     const utilityType = await prisma.utilityType.findUnique({
-      where: { name: utilityTypeName },
+      where: { name: effectiveUtilityTypeName },
     });
 
     if (!utilityType) {
-      return res.status(400).json({ error: `UtilityType '${utilityTypeName}' not found.` });
+      return res.status(400).json({ error: `UtilityType '${effectiveUtilityTypeName}' not found.` });
     }
+
+    const attributeTypes = await prisma.attributeType.findMany();
 
     const newAsset = await prisma.asset.create({
       data: {
         name,
         parentAssetId: parentAssetId ? parseInt(parentAssetId, 10) : null,
         utilityTypeId: utilityType.id,
+        attributes: {
+          create: attributeTypes.map((at) => ({
+            name: at.name,
+            attributeTypeId: at.id,
+          })),
+        },
       },
     });
 
